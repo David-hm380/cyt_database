@@ -14,9 +14,9 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-const userRoutes = require('./routes/userRoutes');
-const verifyToken = require('./middlewares/authMiddleware');
-const terrenosRoutes = require('./modules/terrenos/terrenos.routes');
+const userRoutes = require('./userRoutes');
+const verifyToken = require('./authMiddleware');
+const terrenosRoutes = require('./terrenos.routes');
 
 app.use('/users', userRoutes);
 app.use('/api/terrenos', terrenosRoutes);
@@ -39,6 +39,7 @@ app.get('/', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log('Servidor corriendo');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('Servidor corriendo en puerto', PORT);
 });

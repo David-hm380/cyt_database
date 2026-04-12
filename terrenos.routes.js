@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const controller = require('./terrenos.controller');
-const verifyToken = require('../../middlewares/authMiddleware');
-const checkPermission = require('../../middlewares/permissionMiddleware');
+const verifyToken = require('./authMiddleware');
+const checkPermission = require('./permissionMiddleware');
 
 // 🔐 TODAS protegidas
 router.get('/', verifyToken, checkPermission('terrenos'), controller.getTerrenos);

@@ -24,6 +24,9 @@ pids
 # Coverage directory used by tools like istanbul
 coverage/
 
+
+desktop-app/
+
 # Build outputs
 dist/
 build/

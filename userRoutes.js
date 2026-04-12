@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const controller = require('../controllers/userController');
-const verifyToken = require('../middlewares/authMiddleware');
+const controller = require('./userController');
+const verifyToken = require('./authMiddleware');
 
 // puedes proteger estos si quieres
 router.get('/', verifyToken, controller.getUsers);

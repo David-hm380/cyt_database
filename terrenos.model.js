@@ -1,4 +1,4 @@
-const pool = require('../../db'); // tu conexión a PostgreSQL
+const pool = require('./db'); // tu conexión a PostgreSQL
 
 const getAllTerrenos = async () => {
     const result = await pool.query('SELECT * FROM terrenos ORDER BY id DESC');
