@@ -10,16 +10,16 @@ services:
       - key: NODE_ENV
         value: production
       - key: DB_HOST
-        value: d7431l0gjchc73b1054g-a.oregon-postgres.render.com
+        sync: false
       - key: DB_USER
-        value: cyt_database_user
+        sync: false
       - key: DB_PASSWORD
-        value: qXJ3A9KUFWMeaPTFJXMzStAS8JRW7BiT
+        sync: false
       - key: DB_NAME
         value: cyt_database
       - key: DB_PORT
         value: 5432
       - key: DATABASE_URL
-        value: postgres://cyt_database_user:qXJ3A9KUFWMeaPTFJXMzStAS8JRW7BiT@dpg-d7431l0gjchc73b1054g-a.oregon-postgres.render.com:5432/cyt_database
+        sync: false
     healthCheckPath: /
     autoDeploy: true

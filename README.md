@@ -34,13 +34,12 @@ Backend API para el sistema ERP inmobiliario construido con Node.js y PostgreSQL
 
 ## Variables de Entorno
 
-```
-DB_HOST=d7431l0gjchc73b1054g-a.oregon-postgres.render.com
-DB_USER=cyt_database_user
-DB_PASSWORD=qXJ3A9KUFWMeaPTFJXMzStAS8JRW7BiT
-DB_NAME=cyt_database
-DB_PORT=5432
-DATABASE_URL=postgres://cyt_database_user:qXJ3A9KUFWMeaPTFJXMzStAS8JRW7BiT@dpg-d7431l0gjchc73b1054g-a.oregon-postgres.render.com:5432/cyt_database
+```env
+# Ver .env.example para configuración
+DB_HOST=your-host
+DB_USER=your-user
+DB_PASSWORD=your-password
+DB_NAME=your-database
 ```
 
 ## Instalación
