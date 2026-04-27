@@ -31,9 +31,17 @@ export const AuthProvider = ({ children }) => {
       const response = await usersService.login(credentials);
       
       if (response.token) {
+        // Combinar usuario con permisos
+        const userWithPermissions = {
+          ...response.usuario,
+          permisos: response.permisos
+        };
+        
+        console.log('Login exitoso - Usuario con permisos:', userWithPermissions);
+        
         localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.usuario));
-        setUser(response.usuario);
+        localStorage.setItem('user', JSON.stringify(userWithPermissions));
+        setUser(userWithPermissions);
         return { success: true };
       } else {
         return { success: false, message: response.message };

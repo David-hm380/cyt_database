@@ -11,24 +11,48 @@ function Dashboard() {
     navigate('/login');
   };
 
-  const menuItems = [
-    {
-      id: 'usuarios',
-      title: 'Usuarios',
-      icon: '👥',
-      color: '#3b82f6',
-      bgColor: '#dbeafe',
-      route: '/usuarios'
-    },
+  // Función para verificar permisos
+  const hasPermission = (permission) => {
+    if (!user || !user.permisos) return false;
+    
+    // Si permisos es un objeto, verificar si la propiedad existe y es true
+    if (typeof user.permisos === 'object') {
+      return user.permisos[permission] === true;
+    }
+    
+    // Si permisos es un array, verificar si incluye el permiso
+    if (Array.isArray(user.permisos)) {
+      return user.permisos.includes(permission);
+    }
+    
+    return false;
+  };
+
+  // Definir todos los items del menú
+  const allMenuItems = [
     {
       id: 'terrenos',
       title: 'Terrenos',
-      icon: '🏗️',
+      icon: 'T',
       color: '#10b981',
       bgColor: '#d1fae5',
       route: '/terrenos'
+    },
+    {
+      id: 'filtros-terrenos', // Key única pero usa permiso de terrenos
+      title: 'Filtros',
+      icon: 'F',
+      color: '#3b82f6',
+      bgColor: '#dbeafe',
+      route: '/filtros',
+      permissionRequired: 'terrenos' // Permiso específico
     }
   ];
+
+  // Filtrar módulos por permisos
+  const menuItems = allMenuItems.filter(item => 
+    hasPermission(item.permissionRequired || item.id)
+  );
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -39,6 +63,17 @@ function Dashboard() {
         </div>
         
         <div className="nav-user">
+          {hasPermission('usuarios') && (
+            <button 
+              onClick={() => navigate('/usuarios')}
+              className="btn btn-secondary btn-sm"
+              style={{ marginRight: '10px' }}
+              title="Gestión de Usuarios"
+            >
+                <span style={{ marginRight: '5px' }}>U</span>
+                Usuarios
+              </button>
+            )}
           <div className="nav-user-info">
             <span className="nav-user-name">{user?.nombre}</span>
           </div>
@@ -131,7 +166,7 @@ function Dashboard() {
                 transition: 'all var(--transition)'
               }}>
                 Abrir módulo
-                <span style={{ fontSize: '12px' }}>→</span>
+                <span style={{ fontSize: '12px' }}>&gt;</span>
               </div>
             </div>
           ))}

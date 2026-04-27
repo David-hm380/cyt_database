@@ -457,7 +457,7 @@ function Terrenos() {
               <th>Zona</th>
               <th>Fraccionamiento</th>
               <th>Precio/m²</th>
-              <th>Total</th>
+              <th>Precio Total</th>
               <th>Stock</th>
               <th>Acciones</th>
             </tr>

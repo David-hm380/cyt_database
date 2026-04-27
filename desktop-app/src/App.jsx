@@ -4,6 +4,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Usuarios from './pages/Usuarios';
 import Terrenos from './pages/Terrenos';
+import Filtros from './pages/Filtros';
+import ProtectedRoute from './components/ProtectedRoute';
 import { useAuth } from './contexts/AuthContext';
 
 function App() {
@@ -35,6 +37,18 @@ function App() {
         <Route 
           path="/terrenos" 
           element={user ? <Terrenos /> : <Navigate to="/login" />} 
+        />
+        <Route 
+          path="/filtros" 
+          element={
+            user ? (
+              <ProtectedRoute moduleRequired="terrenos">
+                <Filtros />
+              </ProtectedRoute>
+            ) : (
+              <Navigate to="/login" />
+            )
+          } 
         />
         <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       </Routes>

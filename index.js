@@ -1,25 +1,29 @@
 require('dotenv').config();
 const express = require('express');
 const pool = require('./db');
+const cors = require('cors');
 
 const app = express();
 
-// CORS middleware
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  next();
-});
+// CORS middleware - Usar cors package
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000', 'https://cyt-database-1.onrender.com'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+  optionsSuccessStatus: 200
+}));
 
 app.use(express.json());
 
 const userRoutes = require('./userRoutes');
 const verifyToken = require('./authMiddleware');
 const terrenosRoutes = require('./terrenos.routes');
+const filtersRoutes = require('./filters.routes');
 
 app.use('/users', userRoutes);
 app.use('/api/terrenos', terrenosRoutes);
+app.use('/api/filtros', filtersRoutes);
 
 app.get('/protected', verifyToken, (req, res) => {
   res.json({
