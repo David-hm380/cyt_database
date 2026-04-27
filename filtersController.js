@@ -129,10 +129,10 @@ const getFilterOptions = async (req, res) => {
     let options = [];
     
     if (campo === 'fraccionamiento' && valor_padre) {
-      // Obtener fraccionamientos por zona
+      // Obtener fraccionamientos por zona (case insensitive, ignora espacios)
       const result = await pool.query(
-        'SELECT DISTINCT fraccionamiento FROM terrenos WHERE LOWER(zona) = LOWER($1) AND fraccionamiento IS NOT NULL ORDER BY fraccionamiento',
-        [valor_padre]
+        'SELECT DISTINCT fraccionamiento FROM terrenos WHERE LOWER(TRIM(zona)) = LOWER(TRIM($1)) AND fraccionamiento IS NOT NULL ORDER BY fraccionamiento',
+        [valor_padre.trim()]
       );
       options = result.rows.map(row => row.fraccionamiento);
     }
@@ -168,17 +168,17 @@ const executeFilters = async (req, res) => {
     const params = [];
     let paramIndex = 1;
 
-    // Filtro por zona (texto parcial, case insensitive)
+    // Filtro por zona (texto parcial, case insensitive, ignora espacios)
     if (filtros.zona && filtros.zona.trim()) {
-      query += ` AND LOWER(zona) LIKE $${paramIndex}`;
-      params.push(`%${filtros.zona.toLowerCase()}%`);
+      query += ` AND LOWER(TRIM(zona)) LIKE LOWER(TRIM($${paramIndex}))`;
+      params.push(`%${filtros.zona.trim()}%`);
       paramIndex++;
     }
 
-    // Filtro por fraccionamiento (texto parcial, case insensitive)
+    // Filtro por fraccionamiento (texto parcial, case insensitive, ignora espacios)
     if (filtros.fraccionamiento && filtros.fraccionamiento.trim()) {
-      query += ` AND LOWER(fraccionamiento) LIKE $${paramIndex}`;
-      params.push(`%${filtros.fraccionamiento.toLowerCase()}%`);
+      query += ` AND LOWER(TRIM(fraccionamiento)) LIKE LOWER(TRIM($${paramIndex}))`;
+      params.push(`%${filtros.fraccionamiento.trim()}%`);
       paramIndex++;
     }
 
@@ -189,17 +189,17 @@ const executeFilters = async (req, res) => {
       paramIndex++;
     }
 
-    // Filtro por categoria (texto parcial, case insensitive)
+    // Filtro por categoria (texto parcial, case insensitive, ignora espacios)
     if (filtros.categoria && filtros.categoria.trim()) {
-      query += ` AND LOWER(categoria) LIKE $${paramIndex}`;
-      params.push(`%${filtros.categoria.toLowerCase()}%`);
+      query += ` AND LOWER(TRIM(categoria)) LIKE LOWER(TRIM($${paramIndex}))`;
+      params.push(`%${filtros.categoria.trim()}%`);
       paramIndex++;
     }
 
-    // Filtro por regimen (texto parcial, case insensitive)
+    // Filtro por regimen (texto parcial, case insensitive, ignora espacios)
     if (filtros.regimen && filtros.regimen.trim()) {
-      query += ` AND LOWER(regimen) LIKE $${paramIndex}`;
-      params.push(`%${filtros.regimen.toLowerCase()}%`);
+      query += ` AND LOWER(TRIM(regimen)) LIKE LOWER(TRIM($${paramIndex}))`;
+      params.push(`%${filtros.regimen.trim()}%`);
       paramIndex++;
     }
 
