@@ -5,6 +5,14 @@ const terrenosService = {
     return api.getTerrenos();
   },
 
+  getPaginated: async (page = 1, limit = 20) => {
+    return api.getTerrenosPaginated(page, limit);
+  },
+
+  getById: async (id) => {
+    return api.getTerrenoById(id);
+  },
+
   create: async (terrenoData) => {
     return api.createTerreno(terrenoData);
   },

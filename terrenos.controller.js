@@ -9,6 +9,37 @@ const getTerrenos = async (req, res) => {
     }
 };
 
+const getTerrenosPaginated = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const offset = (page - 1) * limit;
+
+        // Obtener terrenos paginados
+        const terrenos = await Terrenos.getTerrenosPaginated(limit, offset);
+        
+        // Obtener total para cálculo de paginación
+        const totalResult = await Terrenos.getTotalCount();
+        const total = totalResult.total;
+        const totalPages = Math.ceil(total / limit);
+
+        res.json({
+            success: true,
+            data: terrenos,
+            pagination: {
+                page: page,
+                limit: limit,
+                total: total,
+                totalPages: totalPages,
+                hasNext: page < totalPages,
+                hasPrev: page > 1
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
 const getTerrenoById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -67,6 +98,7 @@ const createTerreno = async (req, res) => {
 
 module.exports = {
     getTerrenos,
+    getTerrenosPaginated,
     createTerreno,
     getTerrenoById,
     updateTerreno,

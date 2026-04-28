@@ -7,6 +7,7 @@ const checkPermission = require('./permissionMiddleware');
 
 // 🔐 TODAS protegidas
 router.get('/', verifyToken, checkPermission('terrenos'), controller.getTerrenos);
+router.get('/paginated', verifyToken, checkPermission('terrenos'), controller.getTerrenosPaginated);
 router.get('/:id', verifyToken, checkPermission('terrenos'), controller.getTerrenoById);
 router.post('/', verifyToken, checkPermission('terrenos'), controller.createTerreno);
 router.put('/:id', verifyToken, checkPermission('terrenos'), controller.updateTerreno);

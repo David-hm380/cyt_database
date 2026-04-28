@@ -14,6 +14,9 @@ function Filtros() {
   const [results, setResults] = useState([]);
   const [filterOptions, setFilterOptions] = useState({});
   const [loadingResults, setLoadingResults] = useState(false);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Función para validar que solo se ingresen números
   const handleNumberInput = (e, callback) => {
@@ -67,19 +70,9 @@ function Filtros() {
   };
 
   const loadFilterConfig = async () => {
-    try {
-      const response = await fetch(`https://cyt-database-1.onrender.com/api/filtros/${selectedModule}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setFilterConfig(data.data);
-    } catch (error) {
-      console.error('Error loading filter config:', error);
-      // Fallback: usar configuración hardcoded
-      console.log('Usando fallback de configuración de filtros...');
-      const fallbackConfig = {
+    // Forzar uso de configuración local para asegurar que uso_suelo sea text
+    console.log('Usando configuración local de filtros...');
+    const fallbackConfig = {
         filtros_generales: [
           {
             campo: 'zona',
@@ -95,10 +88,9 @@ function Filtros() {
           },
           {
             campo: 'uso_suelo',
-            tipo: 'select',
+            tipo: 'text',
             etiqueta: 'Uso de Suelo',
-            placeholder: 'Selecciona uso de suelo',
-            opciones: ['habitacional', 'comercial', 'industrial', 'mixto', 'rural']
+            placeholder: 'Escribe el uso de suelo...'
           },
           {
             campo: 'precio_total',
@@ -156,7 +148,6 @@ function Filtros() {
         ]
       };
       setFilterConfig(fallbackConfig);
-    }
   };
 
   const loadFilterOptions = async (campo, valorPadre) => {
@@ -178,6 +169,51 @@ function Filtros() {
     setFilters({});
     setResults([]);
     setShowAdvanced(false);
+    setPagination(null);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && pagination && newPage <= pagination.totalPages) {
+      executeFilters(newPage);
+    }
+  };
+
+  const handleRowDoubleClick = (result) => {
+    // Verificar si el usuario tiene permisos para el módulo
+    const modulePermission = `${selectedModule}`;
+    let hasPermission = false;
+    
+    if (user.permisos) {
+      // Si permisos es un array
+      if (Array.isArray(user.permisos)) {
+        hasPermission = user.permisos.includes(modulePermission);
+      }
+      // Si permisos es un objeto con claves
+      else if (typeof user.permisos === 'object') {
+        hasPermission = user.permisos.hasOwnProperty(modulePermission) || user.permisos[modulePermission] === true;
+      }
+      // Si permisos es un string separado por comas
+      else if (typeof user.permisos === 'string') {
+        const permissionsArray = user.permisos.split(',').map(p => p.trim());
+        hasPermission = permissionsArray.includes(modulePermission);
+      }
+    }
+    
+    if (!hasPermission) {
+      alert(`No tienes permisos para acceder al módulo de ${selectedModule}`);
+      return;
+    }
+
+    // Guardar el elemento seleccionado en localStorage para que el módulo lo cargue
+    localStorage.setItem('selectedItem', JSON.stringify({
+      id: result.id,
+      module: selectedModule,
+      fromFilters: true
+    }));
+
+    // Navegar al módulo específico
+    navigate(`/${selectedModule}`);
   };
 
   const handleFilterChange = async (campo, valor) => {
@@ -199,10 +235,10 @@ function Filtros() {
     }
   };
 
-  const executeFilters = async () => {
+  const executeFilters = async (page = 1) => {
     setLoadingResults(true);
     try {
-      const response = await fetch(`https://cyt-database-1.onrender.com/api/filtros/${selectedModule}`, {
+      const response = await fetch(`https://cyt-database-1.onrender.com/api/filtros/${selectedModule}?page=${page}&limit=50`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -218,9 +254,12 @@ function Filtros() {
       const data = await response.json();
       console.log('Resultados del backend:', data);
       setResults(data.data || []);
+      setPagination(data.pagination || null);
+      setCurrentPage(page);
     } catch (error) {
       console.error('Error executing filters:', error);
       setResults([]);
+      setPagination(null);
       alert('Error al ejecutar filtros. Por favor verifica que el backend esté corriendo en Render.');
     } finally {
       setLoadingResults(false);
@@ -233,8 +272,8 @@ function Filtros() {
     switch (filter.tipo) {
       case 'text':
         return (
-          <div style={{ marginBottom: '15px' }} key={filter.campo}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500', color: '#374151' }}>
+          <div style={{ marginBottom: '4px' }} key={filter.campo}>
+            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', color: '#374151', fontSize: '14px' }}>
               {filter.etiqueta}
             </label>
             <input
@@ -244,11 +283,21 @@ function Filtros() {
               placeholder={filter.placeholder || 'Escribe aquí...'}
               style={{
                 width: '100%',
-                padding: '10px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
+                padding: '10px 12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
                 fontSize: '14px',
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
+                transition: 'all 0.2s',
+                outline: 'none'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#3b82f6';
+                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e2e8f0';
+                e.target.style.boxShadow = 'none';
               }}
             />
           </div>
@@ -256,8 +305,8 @@ function Filtros() {
 
       case 'select':
         return (
-          <div style={{ marginBottom: '15px' }} key={filter.campo}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500', color: '#374151' }}>
+          <div style={{ marginBottom: '4px' }} key={filter.campo}>
+            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', color: '#374151', fontSize: '14px' }}>
               {filter.etiqueta}
             </label>
             <select
@@ -265,11 +314,22 @@ function Filtros() {
               onChange={(e) => handleFilterChange(filter.campo, e.target.value)}
               style={{
                 width: '100%',
-                padding: '10px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
+                padding: '10px 12px',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
                 fontSize: '14px',
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
+                transition: 'all 0.2s',
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#3b82f6';
+                e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = '#e2e8f0';
+                e.target.style.boxShadow = 'none';
               }}
             >
               <option value="">{filter.placeholder || 'Seleccionar...'}</option>
@@ -313,33 +373,56 @@ function Filtros() {
 
       case 'rango':
         return (
-          <div style={{ marginBottom: '15px' }} key={filter.campo}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500', color: '#374151' }}>
+          <div style={{ marginBottom: '4px' }} key={filter.campo}>
+            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', color: '#374151', fontSize: '14px' }}>
               {filter.etiqueta}
             </label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            {/* Dos filas separadas */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <input
                 type="text"
-                placeholder={filter.min_label || 'Mínimo'}
+                placeholder="Mínimo"
                 value={value?.min || ''}
                 onChange={(e) => handleNumberInput(e, (val) => handleFilterChange(filter.campo, { ...value, min: val }))}
                 style={{
-                  padding: '10px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px'
+                  padding: '10px 12px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                  width: '100%'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.boxShadow = 'none';
                 }}
               />
               <input
                 type="text"
-                placeholder={filter.max_label || 'Máximo'}
+                placeholder="Máximo"
                 value={value?.max || ''}
                 onChange={(e) => handleNumberInput(e, (val) => handleFilterChange(filter.campo, { ...value, max: val }))}
                 style={{
-                  padding: '10px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px'
+                  padding: '10px 12px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                  width: '100%'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.boxShadow = 'none';
                 }}
               />
             </div>
@@ -348,45 +431,79 @@ function Filtros() {
 
       case 'rango_o_exacto':
         return (
-          <div style={{ marginBottom: '15px' }} key={filter.campo}>
-            <label style={{ display: 'block', marginBottom: '5px', fontWeight: '500', color: '#374151' }}>
+          <div style={{ marginBottom: '4px' }} key={filter.campo}>
+            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500', color: '#374151', fontSize: '14px' }}>
               {filter.etiqueta}
             </label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+            {/* Tres filas separadas */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <input
                 type="text"
-                placeholder={filter.min_label || 'Mínimo'}
+                placeholder="Mínimo"
                 value={value?.min || ''}
                 onChange={(e) => handleNumberInput(e, (val) => handleFilterChange(filter.campo, { ...value, min: val, exacto: null }))}
                 style={{
-                  padding: '10px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px'
+                  padding: '10px 12px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                  width: '100%'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.boxShadow = 'none';
                 }}
               />
               <input
                 type="text"
-                placeholder={filter.max_label || 'Máximo'}
+                placeholder="Máximo"
                 value={value?.max || ''}
                 onChange={(e) => handleNumberInput(e, (val) => handleFilterChange(filter.campo, { ...value, max: val, exacto: null }))}
                 style={{
-                  padding: '10px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px'
+                  padding: '10px 12px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                  width: '100%'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.boxShadow = 'none';
                 }}
               />
               <input
                 type="text"
-                placeholder={filter.exacto_label || 'Exacto'}
+                placeholder="Exacto"
                 value={value?.exacto || ''}
                 onChange={(e) => handleNumberInput(e, (val) => handleFilterChange(filter.campo, { exacto: val, min: null, max: null }))}
                 style={{
-                  padding: '10px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px'
+                  padding: '10px 12px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                  width: '100%'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#3b82f6';
+                  e.target.style.boxShadow = '0 0 0 3px rgba(59, 130, 246, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = '#e2e8f0';
+                  e.target.style.boxShadow = 'none';
                 }}
               />
             </div>
@@ -414,7 +531,7 @@ function Filtros() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f9fafb' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f8fafc' }}>
       {/* Navigation Header */}
       <nav className="nav-header">
         <div className="nav-brand">
@@ -428,7 +545,7 @@ function Filtros() {
           <button 
             onClick={() => navigate('/dashboard')}
             className="btn btn-secondary btn-sm"
-            style={{ marginRight: '10px' }}
+            style={{ marginRight: '8px' }}
           >
             ← Dashboard
           </button>
@@ -445,23 +562,25 @@ function Filtros() {
       </nav>
 
       {/* Main Content */}
-      <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
         {/* Page Header */}
-        <div className="page-header" style={{ marginBottom: '30px' }}>
+        <div style={{ marginBottom: '32px' }}>
           <h1 style={{ 
             margin: 0, 
-            fontSize: '28px', 
-            fontWeight: 'bold', 
-            color: '#1f2937' 
+            fontSize: '32px', 
+            fontWeight: '700', 
+            color: '#0f172a',
+            letterSpacing: '-0.025em'
           }}>
             Filtros de Búsqueda
           </h1>
           <p style={{ 
             margin: '8px 0 0 0', 
-            color: '#6b7280', 
-            fontSize: '16px' 
+            color: '#64748b', 
+            fontSize: '16px',
+            fontWeight: '400'
           }}>
-            Encuentra propiedades según tus criterios
+            Encuentra propiedades según tus criterios específicos
           </p>
         </div>
 
@@ -469,48 +588,67 @@ function Filtros() {
         {!selectedModule && (
           <div style={{ 
             backgroundColor: '#ffffff', 
-            padding: '30px', 
-            borderRadius: '12px', 
-            boxShadow: '0 1px 3px rgba(0,0,0,0.1)' 
+            padding: '40px', 
+            borderRadius: '16px', 
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+            border: '1px solid #e2e8f0'
           }}>
             <h2 style={{ 
-              marginBottom: '20px', 
+              marginBottom: '24px', 
               fontSize: '20px', 
               fontWeight: '600', 
-              color: '#1f2937' 
+              color: '#0f172a' 
             }}>
               Selecciona un Módulo
             </h2>
             <div style={{ 
               display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
-              gap: '15px' 
+              gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', 
+              gap: '16px' 
             }}>
               {modules.map(module => (
                 <button
                   key={module}
                   onClick={() => setSelectedModule(module)}
                   style={{
-                    padding: '20px',
-                    border: '2px solid #e5e7eb',
-                    borderRadius: '8px',
+                    padding: '24px',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '12px',
                     backgroundColor: '#ffffff',
                     cursor: 'pointer',
-                    transition: 'all 0.2s',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                     fontSize: '16px',
-                    fontWeight: '500',
-                    color: '#374151'
+                    fontWeight: '600',
+                    color: '#475569',
+                    textAlign: 'center',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}
                   onMouseOver={(e) => {
                     e.target.style.borderColor = '#3b82f6';
-                    e.target.style.backgroundColor = '#eff6ff';
+                    e.target.style.backgroundColor = '#f8fafc';
+                    e.target.style.color = '#3b82f6';
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';
                   }}
                   onMouseOut={(e) => {
-                    e.target.style.borderColor = '#e5e7eb';
+                    e.target.style.borderColor = '#e2e8f0';
                     e.target.style.backgroundColor = '#ffffff';
+                    e.target.style.color = '#475569';
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = 'none';
                   }}
                 >
-                  {module.charAt(0).toUpperCase() + module.slice(1)}
+                  <div style={{ 
+                    fontSize: '24px', 
+                    marginBottom: '8px',
+                    fontWeight: '700'
+                  }}>
+                    {module.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    {module.charAt(0).toUpperCase() + module.slice(1)}
+                  </div>
                 </button>
               ))}
             </div>
@@ -519,68 +657,85 @@ function Filtros() {
 
         {/* Filters and Results */}
         {selectedModule && filterConfig && (
-          <div style={{ display: 'grid', gridTemplateColumns: '350px 1fr', gap: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '380px 1fr', gap: '24px' }}>
             {/* Filters Panel */}
             <div style={{ 
               backgroundColor: '#ffffff', 
-              padding: '25px', 
-              borderRadius: '12px', 
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-              height: 'fit-content'
+              padding: '32px', 
+              borderRadius: '16px', 
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              border: '1px solid #e2e8f0',
+              height: 'fit-content',
+              position: 'sticky',
+              top: '24px'
             }}>
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between', 
                 alignItems: 'center', 
-                marginBottom: '20px' 
+                marginBottom: '24px' 
               }}>
-                <h3 style={{ 
-                  margin: 0, 
-                  fontSize: '18px', 
-                  fontWeight: '600', 
-                  color: '#1f2937' 
-                }}>
-                  Filtros
-                </h3>
+                <div>
+                  <h3 style={{ 
+                    margin: 0, 
+                    fontSize: '20px', 
+                    fontWeight: '700', 
+                    color: '#0f172a',
+                    letterSpacing: '-0.025em'
+                  }}>
+                    Filtros
+                  </h3>
+                  <div style={{ 
+                    marginTop: '4px',
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    color: '#64748b',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px'
+                  }}>
+                    {selectedModule.charAt(0).toUpperCase() + selectedModule.slice(1)}
+                  </div>
+                </div>
                 <button
                   onClick={() => setSelectedModule('')}
                   style={{
                     background: 'none',
                     border: 'none',
-                    color: '#6b7280',
+                    color: '#94a3b8',
                     cursor: 'pointer',
-                    fontSize: '18px'
+                    fontSize: '20px',
+                    padding: '4px',
+                    borderRadius: '6px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = '#f1f5f9';
+                    e.target.style.color = '#64748b';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.color = '#94a3b8';
                   }}
                 >
                   ×
                 </button>
               </div>
 
-              <div style={{ marginBottom: '20px' }}>
-                <span style={{ 
-                  fontSize: '14px', 
-                  fontWeight: '500', 
-                  color: '#6b7280',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
-                }}>
-                  {selectedModule.charAt(0).toUpperCase() + selectedModule.slice(1)}
-                </span>
-              </div>
-
               {/* General Filters */}
-              <div style={{ marginBottom: '25px' }}>
+              <div style={{ marginBottom: '32px' }}>
                 <h4 style={{ 
-                  margin: '0 0 15px 0', 
-                  fontSize: '14px', 
+                  margin: '0 0 16px 0', 
+                  fontSize: '13px', 
                   fontWeight: '600', 
-                  color: '#374151',
+                  color: '#475569',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
+                  letterSpacing: '0.05em'
                 }}>
                   Filtros Generales
                 </h4>
-                {filterConfig.filtros_generales.map(filter => renderFilter(filter))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {filterConfig.filtros_generales.map(filter => renderFilter(filter))}
+                </div>
               </div>
 
               {/* Advanced Filters Toggle */}
@@ -588,65 +743,88 @@ function Filtros() {
                 onClick={() => setShowAdvanced(!showAdvanced)}
                 style={{
                   width: '100%',
-                  padding: '12px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '6px',
-                  backgroundColor: '#f9fafb',
+                  padding: '14px 16px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '10px',
+                  backgroundColor: '#f8fafc',
                   cursor: 'pointer',
                   fontSize: '14px',
-                  fontWeight: '500',
-                  color: '#374151',
-                  marginBottom: '15px',
-                  transition: 'all 0.2s'
+                  fontWeight: '600',
+                  color: '#475569',
+                  marginBottom: '16px',
+                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
                 }}
                 onMouseOver={(e) => {
-                  e.target.style.backgroundColor = '#f3f4f6';
+                  e.target.style.backgroundColor = '#f1f5f9';
+                  e.target.style.borderColor = '#cbd5e1';
                 }}
                 onMouseOut={(e) => {
-                  e.target.style.backgroundColor = '#f9fafb';
+                  e.target.style.backgroundColor = '#f8fafc';
+                  e.target.style.borderColor = '#e2e8f0';
                 }}
               >
-                {showAdvanced ? '−' : '+'} Filtros Avanzados
+                <span>Filtros Avanzados</span>
+                <span style={{ 
+                  fontSize: '18px',
+                  fontWeight: '400',
+                  color: '#94a3b8'
+                }}>
+                  {showAdvanced ? '−' : '+'}
+                </span>
               </button>
 
               {/* Advanced Filters */}
               {showAdvanced && (
-                <div style={{ marginBottom: '25px' }}>
+                <div style={{ marginBottom: '32px' }}>
                   <h4 style={{ 
-                    margin: '0 0 15px 0', 
-                    fontSize: '14px', 
+                    margin: '0 0 16px 0', 
+                    fontSize: '13px', 
                     fontWeight: '600', 
-                    color: '#374151',
+                    color: '#475569',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.5px'
+                    letterSpacing: '0.05em'
                   }}>
                     Filtros Avanzados
                   </h4>
-                  {filterConfig.filtros_avanzados.map(filter => renderFilter(filter, true))}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {filterConfig.filtros_avanzados.map(filter => renderFilter(filter, true))}
+                  </div>
                 </div>
               )}
 
               {/* Action Buttons */}
-              <div style={{ display: 'grid', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '32px' }}>
                 <button
                   onClick={executeFilters}
                   disabled={loadingResults}
                   style={{
-                    padding: '12px',
+                    padding: '14px 20px',
                     border: 'none',
-                    borderRadius: '6px',
-                    backgroundColor: '#3b82f6',
+                    borderRadius: '10px',
+                    backgroundColor: loadingResults ? '#94a3b8' : '#3b82f6',
                     color: '#ffffff',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    transition: 'all 0.2s'
+                    cursor: loadingResults ? 'not-allowed' : 'pointer',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: loadingResults ? 'none' : '0 4px 6px -1px rgba(59, 130, 246, 0.3)'
                   }}
                   onMouseOver={(e) => {
-                    e.target.style.backgroundColor = '#2563eb';
+                    if (!loadingResults) {
+                      e.target.style.backgroundColor = '#2563eb';
+                      e.target.style.transform = 'translateY(-1px)';
+                      e.target.style.boxShadow = '0 10px 15px -3px rgba(59, 130, 246, 0.3)';
+                    }
                   }}
                   onMouseOut={(e) => {
-                    e.target.style.backgroundColor = '#3b82f6';
+                    if (!loadingResults) {
+                      e.target.style.backgroundColor = '#3b82f6';
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 4px 6px -1px rgba(59, 130, 246, 0.3)';
+                    }
                   }}
                 >
                   {loadingResults ? 'Buscando...' : 'Aplicar Filtros'}
@@ -654,14 +832,25 @@ function Filtros() {
                 <button
                   onClick={resetFilters}
                   style={{
-                    padding: '12px',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '6px',
+                    padding: '14px 20px',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '10px',
                     backgroundColor: '#ffffff',
-                    color: '#6b7280',
+                    color: '#64748b',
                     cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500'
+                    fontSize: '15px',
+                    fontWeight: '500',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                  onMouseOver={(e) => {
+                    e.target.style.backgroundColor = '#f8fafc';
+                    e.target.style.borderColor = '#cbd5e1';
+                    e.target.style.color = '#475569';
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.backgroundColor = '#ffffff';
+                    e.target.style.borderColor = '#e2e8f0';
+                    e.target.style.color = '#64748b';
                   }}
                 >
                   Limpiar Filtros
@@ -672,44 +861,113 @@ function Filtros() {
             {/* Results Panel */}
             <div style={{ 
               backgroundColor: '#ffffff', 
-              borderRadius: '12px', 
-              boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+              borderRadius: '16px', 
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              border: '1px solid #e2e8f0',
               overflow: 'hidden'
             }}>
               <div style={{ 
-                padding: '20px', 
-                borderBottom: '1px solid #e5e7eb',
-                backgroundColor: '#f9fafb'
+                padding: '24px', 
+                borderBottom: '1px solid #e2e8f0',
+                backgroundColor: '#f8fafc'
               }}>
-                <h3 style={{ 
-                  margin: 0, 
-                  fontSize: '18px', 
-                  fontWeight: '600', 
-                  color: '#1f2937' 
-                }}>
-                  Resultados {results.length > 0 && `(${results.length})`}
-                </h3>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <h3 style={{ 
+                    margin: 0, 
+                    fontSize: '20px', 
+                    fontWeight: '700', 
+                    color: '#0f172a',
+                    letterSpacing: '-0.025em'
+                  }}>
+                    Resultados {results.length > 0 && (
+                      <span style={{ 
+                        color: '#64748b', 
+                        fontWeight: '500',
+                        fontSize: '16px'
+                      }}>
+                        {' '}({results.length})
+                      </span>
+                    )}
+                  </h3>
+                  {results.length > 0 && (
+                    <div style={{ 
+                      fontSize: '14px', 
+                      color: '#64748b',
+                      fontWeight: '500'
+                    }}>
+                      {results.length} propiedad{results.length !== 1 ? 'es' : ''} encontrada{results.length !== 1 ? 's' : ''}
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div style={{ padding: '20px' }}>
+              {/* Indicador de doble click */}
+              <div style={{ 
+                padding: '12px 24px', 
+                backgroundColor: '#f0f9ff', 
+                borderBottom: '1px solid #e2e8f0',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <div style={{ 
+                  fontSize: '16px',
+                  color: '#0369a1'
+                }}>
+                  ℹ️
+                </div>
+                <div style={{ 
+                  fontSize: '14px', 
+                  color: '#0369a1',
+                  fontWeight: '500'
+                }}>
+                  Doble click en cualquier resultado para ver detalles completos en el módulo de {selectedModule}
+                </div>
+              </div>
+
+              <div style={{ padding: '24px' }}>
                 {loadingResults ? (
                   <div style={{ 
                     textAlign: 'center', 
-                    padding: '40px', 
-                    color: '#6b7280' 
+                    padding: '60px 20px', 
+                    color: '#64748b'
                   }}>
-                    Buscando resultados...
+                    <div style={{ 
+                      fontSize: '48px', 
+                      marginBottom: '16px',
+                      opacity: '0.5'
+                    }}>
+                      🔍
+                    </div>
+                    <div style={{ fontSize: '16px', fontWeight: '500' }}>
+                      Buscando resultados...
+                    </div>
                   </div>
                 ) : results.length === 0 ? (
                   <div style={{ 
                     textAlign: 'center', 
-                    padding: '40px', 
-                    color: '#6b7280' 
+                    padding: '60px 20px', 
+                    color: '#64748b'
                   }}>
-                    {Object.keys(filters).length === 0 
-                      ? 'Selecciona filtros y haz clic en "Aplicar Filtros"'
-                      : 'No se encontraron resultados para los filtros seleccionados'
-                    }
+                    <div style={{ 
+                      fontSize: '48px', 
+                      marginBottom: '16px',
+                      opacity: '0.5'
+                    }}>
+                      📋
+                    </div>
+                    <div style={{ fontSize: '16px', fontWeight: '500', marginBottom: '8px' }}>
+                      {Object.keys(filters).length === 0 
+                        ? 'Selecciona filtros y haz clic en "Aplicar Filtros"'
+                        : 'No se encontraron resultados para los filtros seleccionados'
+                      }
+                    </div>
+                    <div style={{ fontSize: '14px', opacity: '0.7' }}>
+                      {Object.keys(filters).length === 0 
+                        ? 'Usa los filtros de la izquierda para buscar propiedades'
+                        : 'Intenta ajustar los criterios de búsqueda'
+                      }
+                    </div>
                   </div>
                 ) : (
                   <div style={{ overflowX: 'auto' }}>
@@ -719,26 +977,38 @@ function Filtros() {
                       fontSize: '14px'
                     }}>
                       <thead>
-                        <tr style={{ backgroundColor: '#f9fafb' }}>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>ID</th>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>Zona</th>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>Fraccionamiento</th>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>Uso Suelo</th>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>Metros</th>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>Precio Total</th>
-                          <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e5e7eb', fontWeight: '600', color: '#374151' }}>Stock</th>
+                        <tr style={{ backgroundColor: '#f8fafc' }}>
+                          <th style={{ padding: '16px 12px', textAlign: 'left', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ID</th>
+                          <th style={{ padding: '16px 12px', textAlign: 'left', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Zona</th>
+                          <th style={{ padding: '16px 12px', textAlign: 'left', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fraccionamiento</th>
+                          <th style={{ padding: '16px 12px', textAlign: 'left', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Uso Suelo</th>
+                          <th style={{ padding: '16px 12px', textAlign: 'left', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Metros</th>
+                          <th style={{ padding: '16px 12px', textAlign: 'left', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Precio Total</th>
+                          <th style={{ padding: '16px 12px', textAlign: 'left', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stock</th>
                         </tr>
                       </thead>
                       <tbody>
                         {results.map((result, index) => (
                           <tr 
                             key={result.id}
+                            onDoubleClick={() => handleRowDoubleClick(result)}
                             style={{ 
                               borderBottom: '1px solid #f3f4f6',
-                              backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb'
+                              backgroundColor: index % 2 === 0 ? '#ffffff' : '#f9fafb',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s'
                             }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = '#e0f2fe';
+                              e.currentTarget.style.transform = 'scale(1.01)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#f9fafb';
+                              e.currentTarget.style.transform = 'scale(1)';
+                            }}
+                            title={`Doble click para ver detalles de ${selectedModule} #${result.id}`}
                           >
-                            <td style={{ padding: '12px' }}>{result.id}</td>
+                            <td style={{ padding: '12px', fontWeight: '500' }}>{result.id}</td>
                             <td style={{ padding: '12px' }}>{result.zona}</td>
                             <td style={{ padding: '12px' }}>{result.fraccionamiento}</td>
                             <td style={{ padding: '12px' }}>{result.uso_suelo}</td>

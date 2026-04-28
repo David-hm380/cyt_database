@@ -21,6 +21,15 @@ const verifyToken = require('./authMiddleware');
 const terrenosRoutes = require('./terrenos.routes');
 const filtersRoutes = require('./filters.routes');
 
+// Middleware para log de todas las peticiones
+app.use((req, res, next) => {
+  console.log(` ${req.method} ${req.path} - ${new Date().toISOString()}`);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log('  - Body:', JSON.stringify(req.body, null, 2));
+  }
+  next();
+});
+
 app.use('/users', userRoutes);
 app.use('/api/terrenos', terrenosRoutes);
 app.use('/api/filtros', filtersRoutes);

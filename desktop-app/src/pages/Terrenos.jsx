@@ -28,11 +28,30 @@ function Terrenos() {
   });
   const [selectedTerreno, setSelectedTerreno] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [pagination, setPagination] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadTerrenos();
+    // Verificar si viene de filtros con un elemento seleccionado
+    const selectedItem = localStorage.getItem('selectedItem');
+    if (selectedItem) {
+      const parsed = JSON.parse(selectedItem);
+      if (parsed.fromFilters && parsed.module === 'terrenos') {
+        // Viene de filtros, cargar solo el terreno específico
+        loadSpecificTerreno(parsed.id);
+        // Limpiar el localStorage para no afectar futuras navegaciones
+        localStorage.removeItem('selectedItem');
+      } else {
+        // Cargar terrenos paginados normalmente
+        loadTerrenosPaginated();
+      }
+    } else {
+      // Cargar terrenos paginados normalmente
+      loadTerrenosPaginated();
+    }
   }, []);
 
   useEffect(() => {
@@ -59,14 +78,47 @@ function Terrenos() {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [selectedTerreno, currentIndex, terrenos.length]);
 
-  const loadTerrenos = async () => {
+  const loadTerrenosPaginated = async (page = 1, append = false) => {
     try {
       setLoading(true);
-      const data = await terrenosService.getAll();
-      setTerrenos(data);
+      const response = await terrenosService.getPaginated(page, 20);
+      
+      if (append) {
+        setTerrenos(prev => [...prev, ...response.data]);
+      } else {
+        setTerrenos(response.data);
+      }
+      
+      setPagination(response.pagination);
+      setHasMore(response.pagination.hasNext);
+      setCurrentPage(page);
       setError(null);
     } catch (err) {
       setError('Error al cargar los terrenos: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMoreTerrenos = () => {
+    if (hasMore && !loading) {
+      loadTerrenosPaginated(currentPage + 1, true);
+    }
+  };
+
+  const loadSpecificTerreno = async (selectedId) => {
+    try {
+      setLoading(true);
+      const terreno = await terrenosService.getById(selectedId);
+      
+      if (terreno) {
+        setSelectedTerreno(terreno);
+        setError(null);
+      } else {
+        setError(`No se encontró el terreno con ID ${selectedId}`);
+      }
+    } catch (err) {
+      setError('Error al cargar el terreno: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }

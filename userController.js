@@ -2,41 +2,56 @@ const pool = require('./db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-
-
-
+// ...
 
 const loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    console.log('🔍 Login attempt received:');
+    console.log('  - Username:', username);
+    console.log('  - Password provided:', password ? 'Yes' : 'No');
+
     const usernameLower = username.toLowerCase();
+    console.log('  - Username lower:', usernameLower);
 
     // Buscar usuario
+    console.log('🔍 Executing query...');
     const userResult = await pool.query(
       'SELECT * FROM usuarios WHERE username = $1',
       [usernameLower]
     );
 
+    console.log('🔍 Query result:');
+    console.log('  - Rows found:', userResult.rows.length);
+    console.log('  - User data:', userResult.rows[0] || 'No user found');
+
     if (userResult.rows.length === 0) {
+      console.log('❌ User not found in database');
       return res.status(400).json({ message: 'Usuario no existe' });
     }
 
     const user = userResult.rows[0];
+    console.log('✅ User found:', user.nombre, 'Active:', user.activo);
 
     // Verificar si está activo
     if (!user.activo) {
+      console.log('❌ User is inactive');
       return res.status(403).json({ message: 'Usuario desactivado' });
     }
 
     // Comparar password
+    console.log('🔍 Comparing passwords...');
     const validPassword = await bcrypt.compare(password, user.password);
+    console.log('  - Password valid:', validPassword);
 
     if (!validPassword) {
+      console.log('❌ Invalid password');
       return res.status(400).json({ message: 'Password incorrecto' });
     }
 
     // Obtener permisos
+    console.log('🔍 Getting user permissions...');
     const permisosResult = await pool.query(
       'SELECT modulo, acceso FROM permisos WHERE usuario_id = $1',
       [user.id]
@@ -46,6 +61,7 @@ const loginUser = async (req, res) => {
     permisosResult.rows.forEach(p => {
       permisos[p.modulo] = p.acceso;
     });
+    console.log('✅ Permissions loaded:', permisos);
 
     // Crear token
     const token = jwt.sign(
@@ -54,6 +70,7 @@ const loginUser = async (req, res) => {
       { expiresIn: '8h' }
     );
 
+    console.log('✅ Login successful for:', user.username);
     res.json({
       message: 'Login exitoso',
       token,
@@ -66,7 +83,7 @@ const loginUser = async (req, res) => {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error('❌ Login error:', error);
     res.status(500).send('Error en login');
   }
 };

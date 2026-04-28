@@ -81,10 +81,40 @@ const api = {
     return response.json();
   },
 
+  getCurrentUser: async () => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/users/me`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  },
+
   // Terrenos
   getTerrenos: async () => {
     const token = localStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/api/terrenos`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  },
+
+  getTerrenosPaginated: async (page = 1, limit = 20) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/api/terrenos/paginated?page=${page}&limit=${limit}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+    return response.json();
+  },
+
+  getTerrenoById: async (id) => {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/api/terrenos/${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },

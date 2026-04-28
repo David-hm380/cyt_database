@@ -57,11 +57,66 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        logout();
+        return false;
+      }
+
+      // Obtener datos actualizados del usuario
+      const response = await usersService.getCurrentUser();
+      if (response.usuario) {
+        // Combinar usuario con permisos actualizados
+        const userWithPermissions = {
+          ...response.usuario,
+          permisos: response.permisos
+        };
+        
+        console.log('Usuario actualizado con permisos:', userWithPermissions);
+        
+        localStorage.setItem('user', JSON.stringify(userWithPermissions));
+        setUser(userWithPermissions);
+        return true;
+      }
+    } catch (error) {
+      console.error('Error al refrescar usuario:', error);
+      // Si hay error, podría ser que el token expiró
+      logout();
+      return false;
+    }
+  };
+
+  const checkPermission = (permission) => {
+    if (!user || !user.permisos) return false;
+    
+    // Si permisos es un objeto, verificar si la propiedad existe y es true
+    if (typeof user.permisos === 'object') {
+      return user.permisos[permission] === true;
+    }
+    
+    // Si permisos es un array, verificar si incluye el permiso
+    if (Array.isArray(user.permisos)) {
+      return user.permisos.includes(permission);
+    }
+    
+    // Si permisos es un string separado por comas
+    if (typeof user.permisos === 'string') {
+      const permissionsArray = user.permisos.split(',').map(p => p.trim());
+      return permissionsArray.includes(permission);
+    }
+    
+    return false;
+  };
+
   const value = {
     user,
     login,
     logout,
-    loading
+    loading,
+    refreshUser,
+    checkPermission
   };
 
   return (

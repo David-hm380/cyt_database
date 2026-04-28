@@ -5,6 +5,19 @@ const getAllTerrenos = async () => {
     return result.rows;
 };
 
+const getTerrenosPaginated = async (limit, offset) => {
+    const result = await pool.query(
+        'SELECT * FROM terrenos ORDER BY id DESC LIMIT $1 OFFSET $2',
+        [limit, offset]
+    );
+    return result.rows;
+};
+
+const getTotalCount = async () => {
+    const result = await pool.query('SELECT COUNT(*) as total FROM terrenos');
+    return result.rows[0].total;
+};
+
 const getTerrenoById = async (id) => {
     const result = await pool.query(
         'SELECT * FROM terrenos WHERE id = $1',
@@ -110,6 +123,8 @@ const createTerreno = async (data) => {
 
 module.exports = {
     getAllTerrenos,
+    getTerrenosPaginated,
+    getTotalCount,
     createTerreno,
     getTerrenoById,
     updateTerreno,

@@ -47,10 +47,9 @@ const getFilterConfig = async (req, res) => {
         },
         {
           campo: 'uso_suelo',
-          tipo: 'select',
+          tipo: 'text',
           etiqueta: 'Uso de Suelo',
-          placeholder: 'Selecciona uso de suelo',
-          opciones: ['habitacional', 'comercial', 'industrial', 'mixto', 'rural']
+          placeholder: 'Escribe el uso de suelo...'
         },
         {
           campo: 'precio_total',
@@ -182,10 +181,10 @@ const executeFilters = async (req, res) => {
       paramIndex++;
     }
 
-    // Filtro por uso_suelo (exacto)
+    // Filtro por uso_suelo (texto parcial, case insensitive, ignora espacios)
     if (filtros.uso_suelo && filtros.uso_suelo.trim()) {
-      query += ` AND uso_suelo = $${paramIndex}`;
-      params.push(filtros.uso_suelo);
+      query += ` AND LOWER(TRIM(uso_suelo)) LIKE LOWER(TRIM($${paramIndex}))`;
+      params.push(`%${filtros.uso_suelo.trim()}%`);
       paramIndex++;
     }
 
@@ -297,17 +296,38 @@ const executeFilters = async (req, res) => {
       }
     }
 
-    // Ordenamiento y límite
-    query += ' ORDER BY created_at DESC LIMIT 100';
+    // Obtener parámetros de paginación
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50;
+    const offset = (page - 1) * limit;
+
+    // Query para contar total de resultados
+    const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as total');
+    const countResult = await pool.query(countQuery, params);
+    const total = parseInt(countResult.rows[0].total);
+
+    // Ordenamiento y paginación
+    query += ' ORDER BY created_at DESC LIMIT $' + (paramIndex + 1) + ' OFFSET $' + (paramIndex + 2);
+    params.push(limit, offset);
 
     console.log('Query ejecutada:', query);
     console.log('Parámetros:', params);
 
     const result = await pool.query(query, params);
 
+    const totalPages = Math.ceil(total / limit);
+
     res.json({
       success: true,
       data: result.rows,
+      pagination: {
+        page: page,
+        limit: limit,
+        total: total,
+        totalPages: totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      },
       count: result.rows.length
     });
 

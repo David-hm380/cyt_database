@@ -31,6 +31,10 @@ const usersService = {
 
   getPermissions: async (userId) => {
     return api.getUserPermissions(userId);
+  },
+
+  getCurrentUser: async () => {
+    return api.getCurrentUser();
   }
 };
 

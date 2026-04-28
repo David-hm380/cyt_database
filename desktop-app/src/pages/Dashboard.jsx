@@ -1,34 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser, checkPermission } = useAuth();
   const navigate = useNavigate();
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  // Función para verificar permisos
-  const hasPermission = (permission) => {
-    if (!user || !user.permisos) return false;
-    
-    // Si permisos es un objeto, verificar si la propiedad existe y es true
-    if (typeof user.permisos === 'object') {
-      return user.permisos[permission] === true;
+  const handleRefreshPermissions = async () => {
+    setRefreshing(true);
+    const success = await refreshUser();
+    if (success) {
+      // Opcional: mostrar mensaje de éxito
+      console.log('Permisos actualizados correctamente');
     }
-    
-    // Si permisos es un array, verificar si incluye el permiso
-    if (Array.isArray(user.permisos)) {
-      return user.permisos.includes(permission);
-    }
-    
-    return false;
+    setRefreshing(false);
   };
 
-  // Definir todos los items del menú
+  // Definir items de módulos (sin filtros)
   const allMenuItems = [
     {
       id: 'terrenos',
@@ -37,21 +31,12 @@ function Dashboard() {
       color: '#10b981',
       bgColor: '#d1fae5',
       route: '/terrenos'
-    },
-    {
-      id: 'filtros-terrenos', // Key única pero usa permiso de terrenos
-      title: 'Filtros',
-      icon: 'F',
-      color: '#3b82f6',
-      bgColor: '#dbeafe',
-      route: '/filtros',
-      permissionRequired: 'terrenos' // Permiso específico
     }
   ];
 
   // Filtrar módulos por permisos
   const menuItems = allMenuItems.filter(item => 
-    hasPermission(item.permissionRequired || item.id)
+    checkPermission(item.permissionRequired || item.id)
   );
 
   return (
@@ -63,7 +48,7 @@ function Dashboard() {
         </div>
         
         <div className="nav-user">
-          {hasPermission('usuarios') && (
+          {checkPermission('usuarios') && (
             <button 
               onClick={() => navigate('/usuarios')}
               className="btn btn-secondary btn-sm"
@@ -78,6 +63,25 @@ function Dashboard() {
             <span className="nav-user-name">{user?.nombre}</span>
           </div>
           <button 
+            onClick={handleRefreshPermissions}
+            className="btn btn-secondary btn-sm"
+            style={{ marginRight: '10px' }}
+            title="Refrescar permisos"
+            disabled={refreshing}
+          >
+            {refreshing ? (
+              <>
+                <span style={{ marginRight: '5px' }}>⟳</span>
+                Actualizando...
+              </>
+            ) : (
+              <>
+                <span style={{ marginRight: '5px' }}>⟳</span>
+                Refrescar
+              </>
+            )}
+          </button>
+          <button 
             onClick={handleLogout}
             className="btn btn-danger btn-sm"
           >
@@ -89,18 +93,86 @@ function Dashboard() {
       {/* Main Content */}
       <div className="container">
         
-        {/* Quick Actions */}
-        <div className="page-header">
-          <div>
-            <h1 className="page-title">Accesos Rápidos</h1>
-            <p style={{ 
-              color: 'var(--text-secondary)', 
-              marginTop: '8px',
-              fontSize: '16px'
+        {/* Barra de Filtros - Funcionalidad Aparte */}
+        {checkPermission('terrenos') && (
+          <div style={{
+            background: 'var(--bg-primary)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-6)',
+            marginBottom: 'var(--space-8)',
+            border: '2px solid var(--border-color)',
+            boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 'var(--space-4)'
             }}>
-              Selecciona un módulo para comenzar a trabajar
-            </p>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-4)'
+              }}>
+                <div style={{
+                  width: '56px',
+                  height: '56px',
+                  background: '#dbeafe',
+                  borderRadius: 'var(--radius-lg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  fontWeight: '700',
+                  color: '#3b82f6',
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.15)'
+                }}>
+                  F
+                </div>
+                <div>
+                  <h2 style={{
+                    margin: 0,
+                    fontSize: 'var(--font-2xl)',
+                    fontWeight: '700',
+                    color: 'var(--text-primary)',
+                    letterSpacing: '-0.025em'
+                  }}>
+                    Filtros
+                  </h2>
+                  <p style={{
+                    margin: '4px 0 0',
+                    fontSize: 'var(--font-sm)',
+                    color: 'var(--text-secondary)',
+                    fontWeight: '500'
+                  }}>
+                    Búsqueda avanzada de propiedades
+                  </p>
+                </div>
+              </div>
+              
+              <button
+                onClick={() => navigate('/filtros')}
+                className="btn btn-primary"
+                style={{
+                  padding: 'var(--space-3) var(--space-6)',
+                  fontSize: 'var(--font-sm)',
+                  fontWeight: '600',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-2)'
+                }}
+              >
+                Abrir Filtros
+                <span style={{ fontSize: '16px' }}>→</span>
+              </button>
+            </div>
           </div>
+        )}
+
+        {/* Módulos */}
+        <div className="page-header">
+          <h1 className="page-title">Módulos</h1>
         </div>
 
         {/* Menu Cards */}
