@@ -42,11 +42,34 @@ const loginUser = async (req, res) => {
 
     // Comparar password
     console.log('🔍 Comparing passwords...');
+    console.log('  - Input password:', password);
+    console.log('  - Stored password hash:', user.password);
+    console.log('  - Stored password length:', user.password.length);
+    console.log('  - Stored password starts with $2b$:', user.password.startsWith('$2b$'));
+    
     const validPassword = await bcrypt.compare(password, user.password);
     console.log('  - Password valid:', validPassword);
 
     if (!validPassword) {
-      console.log('❌ Invalid password');
+      console.log('❌ Invalid password - attempting manual verification...');
+      
+      // Intentar verificar manualmente con diferentes métodos
+      try {
+        // Probar con diferentes rounds
+        const testHash1 = await bcrypt.hash(password, 10);
+        console.log('  - Test hash with 10 rounds:', testHash1.substring(0, 20) + '...');
+        
+        // Probar comparación directa
+        const directCompare = await bcrypt.compare('123456', user.password);
+        console.log('  - Direct compare with "123456":', directCompare);
+        
+        const directCompare2 = await bcrypt.compare('testprueba2011', user.password);
+        console.log('  - Direct compare with "testprueba2011":', directCompare2);
+        
+      } catch (hashError) {
+        console.log('  - Hash error:', hashError.message);
+      }
+      
       return res.status(400).json({ message: 'Password incorrecto' });
     }
 
