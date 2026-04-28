@@ -94,7 +94,7 @@ function Dashboard() {
       <div className="container">
         
         {/* Barra de Filtros - Funcionalidad Aparte */}
-        {checkPermission('terrenos') && (
+        {user && (
           <div style={{
             background: 'var(--bg-primary)',
             borderRadius: 'var(--radius-lg)',
