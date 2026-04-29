@@ -200,11 +200,50 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const getCurrentUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Obtener datos del usuario
+    const userResult = await pool.query(
+      'SELECT id, nombre, username, activo, created_at FROM usuarios WHERE id = $1',
+      [userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    const user = userResult.rows[0];
+
+    // Obtener permisos del usuario
+    const permisosResult = await pool.query(
+      'SELECT modulo, acceso FROM permisos WHERE usuario_id = $1',
+      [userId]
+    );
+
+    const permisos = {};
+    permisosResult.rows.forEach(p => {
+      permisos[p.modulo] = p.acceso;
+    });
+
+    res.json({
+      usuario: user,
+      permisos
+    });
+
+  } catch (error) {
+    console.error('Error en getCurrentUser:', error);
+    res.status(500).json({ message: 'Error obteniendo usuario actual' });
+  }
+};
+
 module.exports = {
   createUser,
   loginUser,
   getUsers,
   getUserPermissions,
   updateUser,
-  deleteUser
+  deleteUser,
+  getCurrentUser
 };

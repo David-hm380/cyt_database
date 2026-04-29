@@ -6,6 +6,7 @@ const verifyToken = require('./authMiddleware');
 
 // puedes proteger estos si quieres
 router.get('/', verifyToken, controller.getUsers);
+router.get('/me', verifyToken, controller.getCurrentUser);
 router.get('/:id/permisos', verifyToken, controller.getUserPermissions);
 router.put('/:id', verifyToken, controller.updateUser);
 router.delete('/:id', verifyToken, controller.deleteUser);
