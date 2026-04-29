@@ -147,7 +147,7 @@ function Terrenos() {
       
       resetForm();
       setShowForm(false);
-      loadTerrenos();
+      loadTerrenosPaginated();
     } catch (err) {
       setError('Error al guardar el terreno: ' + (err.response?.data?.message || err.message));
     }
@@ -170,16 +170,15 @@ function Terrenos() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este terreno?')) {
+    if (window.confirm('¿Estás seguro de que deseas eliminar este terreno?')) {
       try {
         await terrenosService.delete(id);
         
-        // Si el terreno eliminado era el seleccionado, limpiar selección
-        if (selectedTerreno && selectedTerreno.id === id) {
+        if (selectedTerreno?.id === id) {
           setSelectedTerreno(null);
         }
         
-        loadTerrenos();
+        loadTerrenosPaginated();
       } catch (err) {
         setError('Error al eliminar el terreno: ' + (err.response?.data?.message || err.message));
       }
