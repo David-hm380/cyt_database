@@ -798,7 +798,7 @@ function Filtros() {
               {/* Action Buttons */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '32px' }}>
                 <button
-                  onClick={executeFilters}
+                  onClick={() => executeFilters(1)}
                   disabled={loadingResults}
                   style={{
                     padding: '14px 20px',

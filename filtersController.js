@@ -307,7 +307,9 @@ const executeFilters = async (req, res) => {
     const total = parseInt(countResult.rows[0].total);
 
     // Ordenamiento y paginación
-    query += ' ORDER BY created_at DESC LIMIT $' + (paramIndex + 1) + ' OFFSET $' + (paramIndex + 2);
+    const limitParamIndex = paramIndex + 1;
+    const offsetParamIndex = paramIndex + 2;
+    query += ` ORDER BY created_at DESC LIMIT $${limitParamIndex} OFFSET $${offsetParamIndex}`;
     params.push(limit, offset);
 
     console.log('Query ejecutada:', query);
