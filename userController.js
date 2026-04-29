@@ -8,73 +8,33 @@ const loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    console.log('🔍 Login attempt received:');
-    console.log('  - Username:', username);
-    console.log('  - Password provided:', password ? 'Yes' : 'No');
-
     const usernameLower = username.toLowerCase();
-    console.log('  - Username lower:', usernameLower);
 
     // Buscar usuario
-    console.log('🔍 Executing query...');
     const userResult = await pool.query(
       'SELECT * FROM usuarios WHERE username = $1',
       [usernameLower]
     );
 
-    console.log('🔍 Query result:');
-    console.log('  - Rows found:', userResult.rows.length);
-    console.log('  - User data:', userResult.rows[0] || 'No user found');
-
     if (userResult.rows.length === 0) {
-      console.log('❌ User not found in database');
       return res.status(400).json({ message: 'Usuario no existe' });
     }
 
     const user = userResult.rows[0];
-    console.log('✅ User found:', user.nombre, 'Active:', user.activo);
 
     // Verificar si está activo
     if (!user.activo) {
-      console.log('❌ User is inactive');
       return res.status(403).json({ message: 'Usuario desactivado' });
     }
 
     // Comparar password
-    console.log('🔍 Comparing passwords...');
-    console.log('  - Input password:', password);
-    console.log('  - Stored password hash:', user.password);
-    console.log('  - Stored password length:', user.password.length);
-    console.log('  - Stored password starts with $2b$:', user.password.startsWith('$2b$'));
-    
     const validPassword = await bcrypt.compare(password, user.password);
-    console.log('  - Password valid:', validPassword);
 
     if (!validPassword) {
-      console.log('❌ Invalid password - attempting manual verification...');
-      
-      // Intentar verificar manualmente con diferentes métodos
-      try {
-        // Probar con diferentes rounds
-        const testHash1 = await bcrypt.hash(password, 10);
-        console.log('  - Test hash with 10 rounds:', testHash1.substring(0, 20) + '...');
-        
-        // Probar comparación directa
-        const directCompare = await bcrypt.compare('123456', user.password);
-        console.log('  - Direct compare with "123456":', directCompare);
-        
-        const directCompare2 = await bcrypt.compare('testprueba2011', user.password);
-        console.log('  - Direct compare with "testprueba2011":', directCompare2);
-        
-      } catch (hashError) {
-        console.log('  - Hash error:', hashError.message);
-      }
-      
       return res.status(400).json({ message: 'Password incorrecto' });
     }
 
     // Obtener permisos
-    console.log('🔍 Getting user permissions...');
     const permisosResult = await pool.query(
       'SELECT modulo, acceso FROM permisos WHERE usuario_id = $1',
       [user.id]
@@ -84,7 +44,6 @@ const loginUser = async (req, res) => {
     permisosResult.rows.forEach(p => {
       permisos[p.modulo] = p.acceso;
     });
-    console.log('✅ Permissions loaded:', permisos);
 
     // Crear token
     const token = jwt.sign(
@@ -93,7 +52,6 @@ const loginUser = async (req, res) => {
       { expiresIn: '8h' }
     );
 
-    console.log('✅ Login successful for:', user.username);
     res.json({
       message: 'Login exitoso',
       token,
@@ -106,7 +64,7 @@ const loginUser = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Login error:', error);
+    console.error('Error en login:', error);
     res.status(500).send('Error en login');
   }
 };

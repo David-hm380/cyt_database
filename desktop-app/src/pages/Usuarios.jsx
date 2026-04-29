@@ -183,6 +183,7 @@ function Usuarios() {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+    console.log('handleChange:', { name, value, type, checked });
     
     if (name.startsWith('permisos.')) {
       const permisoKey = name.split('.')[1];

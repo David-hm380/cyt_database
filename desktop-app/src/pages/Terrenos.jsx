@@ -210,6 +210,7 @@ function Terrenos() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log('handleChange Terrenos:', { name, value });
     setFormData(prev => ({
       ...prev,
       [name]: value
