@@ -302,20 +302,37 @@ const executeFilters = async (req, res) => {
     const offset = (page - 1) * limit;
 
     // Query para contar total de resultados
-    const countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as total');
-    const countResult = await pool.query(countQuery, params);
-    const total = parseInt(countResult.rows[0].total);
+    let countQuery, countResult, total;
+    
+    if (params.length === 0) {
+      // Si no hay filtros, no usar parámetros
+      countQuery = 'SELECT COUNT(*) as total FROM terrenos';
+      countResult = await pool.query(countQuery);
+    } else {
+      countQuery = query.replace('SELECT *', 'SELECT COUNT(*) as total');
+      countResult = await pool.query(countQuery, params);
+    }
+    total = parseInt(countResult.rows[0].total);
 
     // Ordenamiento y paginación
-    const limitParamIndex = paramIndex + 1;
-    const offsetParamIndex = paramIndex + 2;
-    query += ` ORDER BY created_at DESC LIMIT $${limitParamIndex} OFFSET $${offsetParamIndex}`;
-    params.push(limit, offset);
+    let finalQuery, finalParams;
+    
+    if (params.length === 0) {
+      // Si no hay filtros, usar consulta simple sin parámetros
+      finalQuery = `SELECT * FROM terrenos ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+      finalParams = [];
+    } else {
+      // Si hay filtros, usar parámetros
+      query += ` ORDER BY created_at DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+      params.push(limit, offset);
+      finalQuery = query;
+      finalParams = params;
+    }
 
-    console.log('Query ejecutada:', query);
-    console.log('Parámetros:', params);
+    console.log('Query ejecutada:', finalQuery);
+    console.log('Parámetros:', finalParams);
 
-    const result = await pool.query(query, params);
+    const result = await pool.query(finalQuery, finalParams);
 
     const totalPages = Math.ceil(total / limit);
 
