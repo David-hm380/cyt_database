@@ -182,23 +182,42 @@ function Usuarios() {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    console.log('handleChange:', { name, value, type, checked });
-    
-    if (name.startsWith('permisos.')) {
-      const permisoKey = name.split('.')[1];
-      setFormData(prev => ({
-        ...prev,
-        permisos: {
-          ...prev.permisos,
-          [permisoKey]: checked
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value
-      }));
+    try {
+      const target = e.target;
+      const { name, value, type, checked } = target;
+      
+      console.log('handleChange:', { 
+        name, 
+        value, 
+        type, 
+        checked, 
+        disabled: target.disabled,
+        readOnly: target.readOnly 
+      });
+      
+      // Prevenir si el input está deshabilitado
+      if (target.disabled || target.readOnly) {
+        console.log('Input is disabled or readOnly, skipping update');
+        return;
+      }
+      
+      if (name.startsWith('permisos.')) {
+        const permisoKey = name.split('.')[1];
+        setFormData(prev => ({
+          ...prev,
+          permisos: {
+            ...prev.permisos,
+            [permisoKey]: checked
+          }
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [name]: type === 'checkbox' ? checked : value
+        }));
+      }
+    } catch (error) {
+      console.error('Error in handleChange:', error);
     }
   };
 
@@ -272,7 +291,7 @@ function Usuarios() {
                 ×
               </button>
             </div>
-            <form onSubmit={handleSubmit}>
+            <form key={editingUser ? `edit-${editingUser.id}` : 'new'} onSubmit={handleSubmit}>
               <div className="modal-body">
                 <div style={{ marginBottom: '15px' }}>
                   <label>Nombre:</label>
@@ -281,6 +300,7 @@ function Usuarios() {
                     name="nombre"
                     value={formData.nombre}
                     onChange={handleChange}
+                    onFocus={(e) => console.log('Input focused:', e.target.name)}
                     className="form-control"
                     required
                   />

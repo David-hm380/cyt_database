@@ -208,12 +208,31 @@ function Terrenos() {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    console.log('handleChange Terrenos:', { name, value });
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    try {
+      const target = e.target;
+      const { name, value } = target;
+      
+      console.log('handleChange Terrenos:', { 
+        name, 
+        value, 
+        disabled: target.disabled,
+        readOnly: target.readOnly,
+        type: target.type 
+      });
+      
+      // Prevenir si el input está deshabilitado
+      if (target.disabled || target.readOnly) {
+        console.log('Input is disabled or readOnly, skipping update');
+        return;
+      }
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    } catch (error) {
+      console.error('Error in handleChange Terrenos:', error);
+    }
   };
 
   if (loading) {
@@ -286,7 +305,7 @@ function Terrenos() {
                 ×
               </button>
             </div>
-            <form onSubmit={handleSubmit}>
+            <form key={editingTerreno ? `edit-${editingTerreno.id}` : 'new'} onSubmit={handleSubmit}>
               <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                   <div>
@@ -296,6 +315,7 @@ function Terrenos() {
                       name="zona"
                       value={formData.zona}
                       onChange={handleChange}
+                      onFocus={(e) => console.log('Input focused:', e.target.name)}
                       className="form-control"
                       required
                     />
