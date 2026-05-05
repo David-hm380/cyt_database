@@ -22,6 +22,8 @@ function Usuarios() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [forceUpdate, setForceUpdate] = useState(0); // Para forzar re-render
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -163,43 +165,42 @@ function Usuarios() {
     setShowForm(true);
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
-      try {
-        await usersService.delete(id);
-        
-        // Si el usuario eliminado era el seleccionado, limpiar selección
-        if (selectedUser && selectedUser.id === id) {
-          setSelectedUser(null);
-        }
-        
-        // Forzar limpieza completa de estados con timeout
-        setShowForm(false);
-        
-        // Usar setTimeout para asegurar que el estado se limpie después del re-render
-        setTimeout(() => {
-          resetForm();
-          setEditingUser(null);
-          // Forzar un re-render completo
-          setFormData({
-            nombre: '',
-            username: '',
-            password: '',
-            permisos: {
-              terrenos: false,
-              usuarios: false
-            }
-          });
-          // Forzar actualización del componente
-          setForceUpdate(prev => prev + 1);
-        }, 50);
-        
-        // Recargar la lista
-        loadUsuarios();
-      } catch (err) {
-        setError('Error al eliminar el usuario: ' + (err.response?.data?.message || err.message));
+  const handleDelete = (id) => {
+    setDeleteTargetId(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      await usersService.delete(deleteTargetId);
+      
+      // Si el usuario eliminado era el seleccionado, limpiar selección
+      if (selectedUser && selectedUser.id === deleteTargetId) {
+        setSelectedUser(null);
       }
+      
+      // Limpiar completamente el estado del formulario
+      resetForm();
+      setShowForm(false);
+      setEditingUser(null);
+      setForceUpdate(prev => prev + 1);
+      
+      // Recargar la lista
+      loadUsuarios();
+      
+      // Cerrar modal
+      setShowDeleteConfirm(false);
+      setDeleteTargetId(null);
+    } catch (err) {
+      setError('Error al eliminar el usuario: ' + (err.response?.data?.message || err.message));
+      setShowDeleteConfirm(false);
+      setDeleteTargetId(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setDeleteTargetId(null);
   };
 
   const resetForm = () => {
@@ -598,6 +599,54 @@ function Usuarios() {
                 style={{ padding: '8px 16px' }}
               >
                 Siguiente »
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Confirmación Personalizado */}
+      {showDeleteConfirm && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '24px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+            maxWidth: '400px',
+            width: '90%'
+          }}>
+            <h3 style={{ margin: '0 0 16px 0', color: '#333' }}>
+              Confirmar Eliminación
+            </h3>
+            <p style={{ margin: '0 0 24px 0', color: '#666' }}>
+              ¿Estás seguro de que quieres eliminar este usuario? Esta acción no se puede deshacer.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                className="btn btn-secondary"
+                onClick={cancelDelete}
+                style={{ padding: '8px 16px' }}
+              >
+                Cancelar
+              </button>
+              <button
+                className="btn btn-danger"
+                onClick={confirmDelete}
+                style={{ padding: '8px 16px' }}
+              >
+                Sí, Eliminar
               </button>
             </div>
           </div>
