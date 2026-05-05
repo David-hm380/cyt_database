@@ -28,6 +28,17 @@ function Usuarios() {
     loadUsuarios();
   }, []);
 
+  // Limpiar estados cuando se cierra el formulario
+  useEffect(() => {
+    if (!showForm) {
+      // Forzar limpieza de estados cuando el modal se cierra
+      const timer = setTimeout(() => {
+        setEditingUser(null);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showForm]);
+
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (!selectedUser) return;
@@ -161,6 +172,11 @@ function Usuarios() {
           setSelectedUser(null);
         }
         
+        // Limpiar completamente el estado del formulario
+        resetForm();
+        setShowForm(false);
+        
+        // Recargar la lista
         loadUsuarios();
       } catch (err) {
         setError('Error al eliminar el usuario: ' + (err.response?.data?.message || err.message));

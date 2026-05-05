@@ -54,6 +54,17 @@ function Terrenos() {
     }
   }, []);
 
+  // Limpiar estados cuando se cierra el formulario
+  useEffect(() => {
+    if (!showForm) {
+      // Forzar limpieza de estados cuando el modal se cierra
+      const timer = setTimeout(() => {
+        setEditingTerreno(null);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [showForm]);
+
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (!selectedTerreno) return;
@@ -178,6 +189,11 @@ function Terrenos() {
           setSelectedTerreno(null);
         }
         
+        // Limpiar completamente el estado del formulario
+        resetForm();
+        setShowForm(false);
+        
+        // Recargar la lista
         loadTerrenosPaginated();
       } catch (err) {
         setError('Error al eliminar el terreno: ' + (err.response?.data?.message || err.message));
