@@ -181,27 +181,20 @@ function Filtros() {
 
   const handleRowDoubleClick = (result) => {
     // Verificar si el usuario tiene permisos para el módulo
-    const modulePermission = `${selectedModule}`;
-    let hasPermission = false;
+    const modulePermission = selectedModule;
     
-    if (user.permisos) {
-      // Si permisos es un array
-      if (Array.isArray(user.permisos)) {
-        hasPermission = user.permisos.includes(modulePermission);
-      }
-      // Si permisos es un objeto con claves
-      else if (typeof user.permisos === 'object') {
-        hasPermission = user.permisos.hasOwnProperty(modulePermission) || user.permisos[modulePermission] === true;
-      }
-      // Si permisos es un string separado por comas
-      else if (typeof user.permisos === 'string') {
-        const permissionsArray = user.permisos.split(',').map(p => p.trim());
-        hasPermission = permissionsArray.includes(modulePermission);
-      }
-    }
+    console.log('Verificando permisos para módulo:', modulePermission);
+    console.log('Permisos del usuario:', user.permisos);
+    
+    // Los permisos vienen como objeto: { terrenos: true, usuarios: false }
+    const hasPermission = user.permisos && user.permisos[modulePermission] === true;
+    
+    console.log('¿Tiene permiso?', hasPermission);
     
     if (!hasPermission) {
-      alert(`No tienes permisos para acceder al módulo de ${selectedModule}`);
+      // Mostrar mensaje más amigable
+      const moduleName = modulePermission.charAt(0).toUpperCase() + modulePermission.slice(1);
+      alert(`No tienes permisos para acceder al módulo de ${moduleName}.\n\nContacta al administrador para solicitar acceso.`);
       return;
     }
 
@@ -985,6 +978,7 @@ function Filtros() {
                           <th style={{ padding: '16px 12px', textAlign: 'left', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Metros</th>
                           <th style={{ padding: '16px 12px', textAlign: 'left', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Precio Total</th>
                           <th style={{ padding: '16px 12px', textAlign: 'left', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Stock</th>
+                          <th style={{ padding: '16px 12px', textAlign: 'center', borderBottom: '1px solid #e2e8f0', fontWeight: '600', color: '#475569', fontSize: '13px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Acceso</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1006,7 +1000,11 @@ function Filtros() {
                               e.currentTarget.style.backgroundColor = index % 2 === 0 ? '#ffffff' : '#f9fafb';
                               e.currentTarget.style.transform = 'scale(1)';
                             }}
-                            title={`Doble click para ver detalles de ${selectedModule} #${result.id}`}
+                            title={
+                              user.permisos && user.permisos[selectedModule] === true
+                                ? `Doble click para ver detalles de ${selectedModule} #${result.id}`
+                                : `No tienes permiso para acceder a ${selectedModule}. Doble click para solicitar acceso.`
+                            }
                           >
                             <td style={{ padding: '12px', fontWeight: '500' }}>{result.id}</td>
                             <td style={{ padding: '12px' }}>{result.zona}</td>
@@ -1017,6 +1015,25 @@ function Filtros() {
                               ${(result.precio_m2 * result.metros_cuadrados).toLocaleString()}
                             </td>
                             <td style={{ padding: '12px' }}>{result.stock}</td>
+                            <td style={{ padding: '12px', textAlign: 'center' }}>
+                              {user.permisos && user.permisos[selectedModule] === true ? (
+                                <span style={{ 
+                                  color: '#10b981', 
+                                  fontSize: '18px',
+                                  title: 'Tienes acceso a este módulo'
+                                }}>
+                                  ✓
+                                </span>
+                              ) : (
+                                <span style={{ 
+                                  color: '#ef4444', 
+                                  fontSize: '18px',
+                                  title: 'No tienes acceso a este módulo'
+                                }}>
+                                  ✗
+                                </span>
+                              )}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
