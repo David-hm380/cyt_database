@@ -40,15 +40,7 @@ function App() {
         />
         <Route 
           path="/filtros" 
-          element={
-            user ? (
-              <ProtectedRoute moduleRequired="terrenos">
-                <Filtros />
-              </ProtectedRoute>
-            ) : (
-              <Navigate to="/login" />
-            )
-          } 
+          element={user ? <Filtros /> : <Navigate to="/login" />} 
         />
         <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
       </Routes>
