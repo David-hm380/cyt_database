@@ -1148,8 +1148,7 @@ function Filtros() {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-          backdropFilter: 'blur(4px)',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1157,9 +1156,9 @@ function Filtros() {
           padding: '20px'
         }}>
           <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            backgroundColor: 'var(--bg-primary)',
+            borderRadius: 'var(--radius-lg)',
+            boxShadow: 'var(--shadow-lg)',
             maxWidth: '700px',
             width: '100%',
             maxHeight: '85vh',
@@ -1169,9 +1168,9 @@ function Filtros() {
           }}>
             {/* Header */}
             <div style={{
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              padding: '24px',
-              borderRadius: '16px 16px 0 0',
+              background: 'var(--primary-color)',
+              padding: '20px',
+              borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
               position: 'relative'
             }}>
               <div style={{
@@ -1182,10 +1181,9 @@ function Filtros() {
                 <div>
                   <h2 style={{ 
                     margin: 0, 
-                    color: '#ffffff',
-                    fontSize: '24px',
-                    fontWeight: '700',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+                    color: 'var(--text-inverse)',
+                    fontSize: '20px',
+                    fontWeight: '700'
                   }}>
                     {selectedModule.charAt(0).toUpperCase() + selectedModule.slice(1)} #{selectedResult.id}
                   </h2>
@@ -1200,27 +1198,18 @@ function Filtros() {
                 </div>
                 <button
                   onClick={closeDetails}
+                  className="btn btn-secondary"
                   style={{
                     background: 'rgba(255, 255, 255, 0.2)',
-                    border: '2px solid rgba(255, 255, 255, 0.3)',
-                    borderRadius: '50%',
-                    width: '40px',
-                    height: '40px',
-                    fontSize: '20px',
-                    cursor: 'pointer',
-                    color: '#ffffff',
+                    border: '1px solid rgba(255, 255, 255, 0.3)',
+                    borderRadius: 'var(--radius)',
+                    width: '32px',
+                    height: '32px',
+                    fontSize: '18px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.background = 'rgba(255, 255, 255, 0.3)';
-                    e.target.style.transform = 'scale(1.1)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.background = 'rgba(255, 255, 255, 0.2)';
-                    e.target.style.transform = 'scale(1)';
+                    padding: '0'
                   }}
                 >
                   ×
@@ -1230,223 +1219,232 @@ function Filtros() {
 
             {/* Content */}
             <div style={{
-              padding: '24px',
+              padding: '20px',
               overflowY: 'auto',
               flex: 1
             }}>
               {/* Grid de información */}
               <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-                gap: '20px',
-                marginBottom: '24px'
+                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
+                gap: '16px',
+                marginBottom: '20px'
               }}>
-                {/* ID y Zona */}
+                {/* ID */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>ID</div>
-                  <div style={{ fontSize: '18px', fontWeight: '700', color: '#1e293b' }}>{selectedResult.id}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>ID</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>{selectedResult.id}</div>
                 </div>
 
+                {/* Zona */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Zona</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.zona}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Zona</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.zona}</div>
                 </div>
 
-                {/* Fraccionamiento y Uso de Suelo */}
+                {/* Fraccionamiento */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Fraccionamiento</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.fraccionamiento}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Fraccionamiento</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.fraccionamiento}</div>
                 </div>
 
+                {/* Uso de Suelo */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Uso de Suelo</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.uso_suelo}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Uso de Suelo</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.uso_suelo}</div>
                 </div>
 
-                {/* Régimen y Categoría */}
+                {/* Régimen */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Régimen</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.regimen}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Régimen</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.regimen}</div>
                 </div>
 
+                {/* Categoría */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Categoría</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.categoria}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Categoría</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.categoria}</div>
                 </div>
 
-                {/* Tipo y Precio */}
+                {/* Tipo */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Tipo</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.tipo}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Tipo</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.tipo}</div>
                 </div>
 
+                {/* Precio por m² */}
                 <div style={{
-                  background: '#fef3c7',
+                  background: 'var(--warning-light)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #f59e0b'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--warning-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#92400e', fontWeight: '600', marginBottom: '4px' }}>Precio por m²</div>
-                  <div style={{ fontSize: '18px', fontWeight: '700', color: '#92400e' }}>${selectedResult.precio_m2}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--warning-color)', fontWeight: '600', marginBottom: '4px' }}>Precio por m²</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--warning-color)' }}>${selectedResult.precio_m2}</div>
                 </div>
 
-                {/* Medidas */}
+                {/* Metros Cuadrados */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Metros Cuadrados</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.metros_cuadrados}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Metros Cuadrados</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.metros_cuadrados}</div>
                 </div>
 
+                {/* Frente */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Frente (m)</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.frente_metros}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Frente (m)</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.frente_metros}</div>
                 </div>
 
+                {/* Fondo */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Fondo (m)</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.fondo_metros}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Fondo (m)</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.fondo_metros}</div>
                 </div>
 
-                {/* Stock y Entrega */}
+                {/* Stock */}
                 <div style={{
-                  background: '#dcfce7',
+                  background: 'var(--success-light)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #22c55e'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--success-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#166534', fontWeight: '600', marginBottom: '4px' }}>Stock</div>
-                  <div style={{ fontSize: '18px', fontWeight: '700', color: '#166534' }}>{selectedResult.stock}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--success-color)', fontWeight: '600', marginBottom: '4px' }}>Stock</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--success-color)' }}>{selectedResult.stock}</div>
                 </div>
 
+                {/* Entrega */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Entrega</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.entrega}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Entrega</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.entrega}</div>
                 </div>
 
                 {/* Ubicación (span completo) */}
                 <div style={{
-                  background: '#eff6ff',
+                  background: 'var(--primary-light)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #3b82f6',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--primary-color)',
                   gridColumn: '1 / -1'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#1e40af', fontWeight: '600', marginBottom: '4px' }}>Ubicación</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e40af' }}>{selectedResult.ubicacion}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--primary-color)', fontWeight: '600', marginBottom: '4px' }}>Ubicación</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.ubicacion}</div>
                 </div>
 
-                {/* Vigencia y Contacto */}
+                {/* Vigencia Precio */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Vigencia Precio</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Vigencia Precio</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>
                     {selectedResult.vigencia_precio ? new Date(selectedResult.vigencia_precio).toLocaleDateString() : 'N/A'}
                   </div>
                 </div>
 
+                {/* Contacto Nombre */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Contacto Nombre</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.contacto_nombre}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Contacto Nombre</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.contacto_nombre}</div>
                 </div>
 
+                {/* Contacto Teléfono */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0'
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Contacto Teléfono</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.contacto_telefono}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Contacto Teléfono</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.contacto_telefono}</div>
                 </div>
 
                 {/* Precio Total (destacado) */}
                 <div style={{
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  background: 'var(--success-color)',
                   padding: '20px',
-                  borderRadius: '12px',
-                  border: '1px solid #059669',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--success-hover)',
                   gridColumn: '1 / -1',
                   textAlign: 'center'
                 }}>
-                  <div style={{ fontSize: '14px', color: '#d1fae5', fontWeight: '600', marginBottom: '8px' }}>PRECIO TOTAL</div>
-                  <div style={{ fontSize: '28px', fontWeight: '800', color: '#ffffff' }}>
+                  <div style={{ fontSize: '14px', color: 'var(--success-light)', fontWeight: '600', marginBottom: '8px' }}>PRECIO TOTAL</div>
+                  <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-inverse)' }}>
                     ${(selectedResult.precio_m2 * selectedResult.metros_cuadrados).toLocaleString()}
                   </div>
                 </div>
 
                 {/* Fecha de Creación */}
                 <div style={{
-                  background: '#f8fafc',
+                  background: 'var(--bg-secondary)',
                   padding: '16px',
-                  borderRadius: '12px',
-                  border: '1px solid #e2e8f0',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)',
                   gridColumn: '1 / -1'
                 }}>
-                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Fecha de Creación</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Fecha de Creación</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>
                     {new Date(selectedResult.created_at).toLocaleString()}
                   </div>
                 </div>
@@ -1457,40 +1455,31 @@ function Filtros() {
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                padding: '20px',
-                background: '#f9fafb',
-                borderRadius: '12px',
-                border: '1px solid #e5e7eb'
+                padding: '16px',
+                background: 'var(--bg-tertiary)',
+                borderRadius: 'var(--radius)',
+                border: '1px solid var(--border-color)'
               }}>
                 <button
                   onClick={() => navigateResult('prev')}
                   disabled={selectedIndex === 0}
+                  className="btn btn-secondary"
                   style={{
-                    background: selectedIndex === 0 ? '#f3f4f6' : '#3b82f6',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '12px 20px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: selectedIndex === 0 ? 'not-allowed' : 'pointer',
-                    color: '#ffffff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    transition: 'all 0.2s ease'
+                    opacity: selectedIndex === 0 ? 0.5 : 1,
+                    cursor: selectedIndex === 0 ? 'not-allowed' : 'pointer'
                   }}
                 >
                   ← Anterior
                 </button>
                 
                 <div style={{
-                  background: '#ffffff',
+                  background: 'var(--bg-primary)',
                   padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: '1px solid #e5e7eb',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid var(--border-color)',
                   fontSize: '14px',
                   fontWeight: '600',
-                  color: '#374151'
+                  color: 'var(--text-primary)'
                 }}>
                   {selectedIndex + 1} de {results.length}
                 </div>
@@ -1498,19 +1487,10 @@ function Filtros() {
                 <button
                   onClick={() => navigateResult('next')}
                   disabled={selectedIndex === results.length - 1}
+                  className="btn btn-secondary"
                   style={{
-                    background: selectedIndex === results.length - 1 ? '#f3f4f6' : '#3b82f6',
-                    border: 'none',
-                    borderRadius: '8px',
-                    padding: '12px 20px',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    cursor: selectedIndex === results.length - 1 ? 'not-allowed' : 'pointer',
-                    color: '#ffffff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    transition: 'all 0.2s ease'
+                    opacity: selectedIndex === results.length - 1 ? 0.5 : 1,
+                    cursor: selectedIndex === results.length - 1 ? 'not-allowed' : 'pointer'
                   }}
                 >
                   Siguiente →
@@ -1521,15 +1501,15 @@ function Filtros() {
               <div style={{
                 marginTop: '16px',
                 padding: '16px',
-                background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
-                borderRadius: '12px',
-                border: '1px solid #0ea5e9',
+                background: 'var(--info-light)',
+                borderRadius: 'var(--radius)',
+                border: '1px solid var(--info-color)',
                 fontSize: '13px',
-                color: '#0c4a6e'
+                color: 'var(--text-primary)'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '16px' }}>💡</span>
-                  <strong style={{ color: '#075985' }}>Instrucciones de uso:</strong>
+                  <span style={{ fontSize: '16px' }}>ℹ️</span>
+                  <strong style={{ color: 'var(--info-color)' }}>Instrucciones de uso:</strong>
                 </div>
                 <div style={{ marginLeft: '24px' }}>
                   <div style={{ marginBottom: '4px' }}>• <strong>Un click:</strong> Ver detalles (lo que estás viendo ahora)</div>
