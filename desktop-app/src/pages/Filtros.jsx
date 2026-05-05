@@ -19,6 +19,8 @@ function Filtros() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showPermissionDenied, setShowPermissionDenied] = useState(false);
   const [deniedModule, setDeniedModule] = useState('');
+  const [selectedResult, setSelectedResult] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Función para validar que solo se ingresen números
   const handleNumberInput = (e, callback) => {
@@ -179,6 +181,31 @@ function Filtros() {
     if (newPage >= 1 && pagination && newPage <= pagination.totalPages) {
       executeFilters(newPage);
     }
+  };
+
+  // Función para manejar clic simple (ver detalles)
+  const handleRowClick = (result, index) => {
+    setSelectedResult(result);
+    setSelectedIndex(index);
+  };
+
+  // Función para navegar entre resultados
+  const navigateResult = (direction) => {
+    if (direction === 'prev' && selectedIndex > 0) {
+      const newIndex = selectedIndex - 1;
+      setSelectedIndex(newIndex);
+      setSelectedResult(results[newIndex]);
+    } else if (direction === 'next' && selectedIndex < results.length - 1) {
+      const newIndex = selectedIndex + 1;
+      setSelectedIndex(newIndex);
+      setSelectedResult(results[newIndex]);
+    }
+  };
+
+  // Función para cerrar vista de detalles
+  const closeDetails = () => {
+    setSelectedResult(null);
+    setSelectedIndex(0);
   };
 
   const handleRowDoubleClick = (result) => {
@@ -988,6 +1015,7 @@ function Filtros() {
                         {results.map((result, index) => (
                           <tr 
                             key={result.id}
+                            onClick={() => handleRowClick(result, index)}
                             onDoubleClick={() => handleRowDoubleClick(result)}
                             style={{ 
                               borderBottom: '1px solid #f3f4f6',
@@ -1108,6 +1136,185 @@ function Filtros() {
             >
               Entendido
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Detalles Completos */}
+      {selectedResult && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '24px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+            maxWidth: '600px',
+            width: '90%',
+            maxHeight: '80vh',
+            overflowY: 'auto'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px'
+            }}>
+              <h3 style={{ 
+                margin: 0, 
+                color: '#333',
+                fontSize: '20px',
+                fontWeight: '600'
+              }}>
+                Detalles de {selectedModule.charAt(0).toUpperCase() + selectedModule.slice(1)} #{selectedResult.id}
+              </h3>
+              <button
+                onClick={closeDetails}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  cursor: 'pointer',
+                  color: '#666',
+                  padding: '0'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              <div>
+                <strong>ID:</strong> {selectedResult.id}
+              </div>
+              <div>
+                <strong>Zona:</strong> {selectedResult.zona}
+              </div>
+              <div>
+                <strong>Fraccionamiento:</strong> {selectedResult.fraccionamiento}
+              </div>
+              <div>
+                <strong>Uso de Suelo:</strong> {selectedResult.uso_suelo}
+              </div>
+              <div>
+                <strong>Régimen:</strong> {selectedResult.regimen}
+              </div>
+              <div>
+                <strong>Categoría:</strong> {selectedResult.categoria}
+              </div>
+              <div>
+                <strong>Tipo:</strong> {selectedResult.tipo}
+              </div>
+              <div>
+                <strong>Precio por m²:</strong> ${selectedResult.precio_m2}
+              </div>
+              <div>
+                <strong>Metros Cuadrados:</strong> {selectedResult.metros_cuadrados}
+              </div>
+              <div>
+                <strong>Frente (m):</strong> {selectedResult.frente_metros}
+              </div>
+              <div>
+                <strong>Fondo (m):</strong> {selectedResult.fondo_metros}
+              </div>
+              <div>
+                <strong>Stock:</strong> {selectedResult.stock}
+              </div>
+              <div>
+                <strong>Entrega:</strong> {selectedResult.entrega}
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <strong>Ubicación:</strong> {selectedResult.ubicacion}
+              </div>
+              <div>
+                <strong>Vigencia Precio:</strong> {selectedResult.vigencia_precio ? new Date(selectedResult.vigencia_precio).toLocaleDateString() : 'N/A'}
+              </div>
+              <div>
+                <strong>Contacto Nombre:</strong> {selectedResult.contacto_nombre}
+              </div>
+              <div>
+                <strong>Contacto Teléfono:</strong> {selectedResult.contacto_telefono}
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <strong>Precio Total:</strong> ${(selectedResult.precio_m2 * selectedResult.metros_cuadrados).toLocaleString()}
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <strong>Fecha de Creación:</strong> {new Date(selectedResult.created_at).toLocaleString()}
+              </div>
+            </div>
+
+            {/* Navegación entre resultados */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: '24px',
+              paddingTop: '16px',
+              borderTop: '1px solid #e5e7eb'
+            }}>
+              <button
+                onClick={() => navigateResult('prev')}
+                disabled={selectedIndex === 0}
+                className="btn btn-secondary"
+                style={{ 
+                  padding: '8px 16px',
+                  opacity: selectedIndex === 0 ? 0.5 : 1,
+                  cursor: selectedIndex === 0 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                ← Anterior
+              </button>
+              
+              <span style={{ 
+                fontSize: '14px', 
+                color: '#666',
+                fontWeight: '500'
+              }}>
+                {selectedIndex + 1} de {results.length}
+              </span>
+              
+              <button
+                onClick={() => navigateResult('next')}
+                disabled={selectedIndex === results.length - 1}
+                className="btn btn-secondary"
+                style={{ 
+                  padding: '8px 16px',
+                  opacity: selectedIndex === results.length - 1 ? 0.5 : 1,
+                  cursor: selectedIndex === results.length - 1 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                Siguiente →
+              </button>
+            </div>
+
+            {/* Instrucciones */}
+            <div style={{
+              marginTop: '16px',
+              padding: '12px',
+              backgroundColor: '#f0f9ff',
+              border: '1px solid #0ea5e9',
+              borderRadius: '6px',
+              fontSize: '13px',
+              color: '#0c4a6e'
+            }}>
+              <strong>ℹ️ Información:</strong><br/>
+              • Un click: Ver detalles (lo que estás viendo ahora)<br/>
+              • Doble click: {user.permisos && user.permisos[selectedModule] === true ? 
+                `Entrar al módulo de ${selectedModule}` : 
+                `Solicitar acceso al módulo de ${selectedModule}`
+              }<br/>
+              • Usa las flechas para navegar entre resultados
+            </div>
           </div>
         </div>
       )}
