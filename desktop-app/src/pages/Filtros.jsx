@@ -1149,18 +1149,19 @@ function Filtros() {
           right: 0,
           bottom: 0,
           backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(4px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 9999,
-          backdropFilter: 'blur(4px)'
+          padding: '20px'
         }}>
           <div style={{
             backgroundColor: '#ffffff',
             borderRadius: '16px',
             boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
             maxWidth: '700px',
-            width: '90%',
+            width: '100%',
             maxHeight: '85vh',
             overflow: 'hidden',
             display: 'flex',
@@ -1169,9 +1170,8 @@ function Filtros() {
             {/* Header */}
             <div style={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              padding: '24px 32px',
+              padding: '24px',
               borderRadius: '16px 16px 0 0',
-              color: 'white',
               position: 'relative'
             }}>
               <div style={{
@@ -1180,34 +1180,35 @@ function Filtros() {
                 alignItems: 'center'
               }}>
                 <div>
-                  <h3 style={{ 
+                  <h2 style={{ 
                     margin: 0, 
+                    color: '#ffffff',
                     fontSize: '24px',
                     fontWeight: '700',
-                    letterSpacing: '-0.5px'
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
                   }}>
-                    {selectedModule.charAt(0).toUpperCase() + selectedModule.slice(1)}
-                  </h3>
-                  <div style={{
+                    {selectedModule.charAt(0).toUpperCase() + selectedModule.slice(1)} #{selectedResult.id}
+                  </h2>
+                  <p style={{
+                    margin: '4px 0 0',
+                    color: 'rgba(255, 255, 255, 0.9)',
                     fontSize: '14px',
-                    opacity: 0.9,
-                    marginTop: '4px',
                     fontWeight: '500'
                   }}>
-                    ID: #{selectedResult.id}
-                  </div>
+                    Información completa del inmueble
+                  </p>
                 </div>
                 <button
                   onClick={closeDetails}
                   style={{
                     background: 'rgba(255, 255, 255, 0.2)',
-                    border: 'none',
-                    fontSize: '20px',
-                    cursor: 'pointer',
-                    color: 'white',
+                    border: '2px solid rgba(255, 255, 255, 0.3)',
+                    borderRadius: '50%',
                     width: '40px',
                     height: '40px',
-                    borderRadius: '50%',
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    color: '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -1229,383 +1230,314 @@ function Filtros() {
 
             {/* Content */}
             <div style={{
-              padding: '32px',
+              padding: '24px',
               overflowY: 'auto',
               flex: 1
             }}>
               {/* Grid de información */}
               <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-                gap: '24px',
-                marginBottom: '32px'
+                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+                gap: '20px',
+                marginBottom: '24px'
               }}>
-                {/* Tarjeta de Información General */}
+                {/* ID y Zona */}
                 <div style={{
                   background: '#f8fafc',
-                  padding: '20px',
+                  padding: '16px',
                   borderRadius: '12px',
                   border: '1px solid #e2e8f0'
                 }}>
-                  <h4 style={{
-                    margin: '0 0 16px 0',
-                    color: '#1e293b',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
-                    <span style={{
-                      width: '8px',
-                      height: '8px',
-                      background: '#3b82f6',
-                      borderRadius: '50%'
-                    }}></span>
-                    Información General
-                  </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748b', fontSize: '14px' }}>ID:</span>
-                      <span style={{ fontWeight: '600', color: '#1e293b' }}>#{selectedResult.id}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748b', fontSize: '14px' }}>Zona:</span>
-                      <span style={{ fontWeight: '600', color: '#1e293b' }}>{selectedResult.zona}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748b', fontSize: '14px' }}>Fraccionamiento:</span>
-                      <span style={{ fontWeight: '600', color: '#1e293b' }}>{selectedResult.fraccionamiento}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748b', fontSize: '14px' }}>Ubicación:</span>
-                      <span style={{ fontWeight: '600', color: '#1e293b', textAlign: 'right', flex: 1 }}>{selectedResult.ubicacion}</span>
-                    </div>
-                  </div>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>ID</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: '#1e293b' }}>{selectedResult.id}</div>
                 </div>
 
-                {/* Tarjeta de Características */}
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Zona</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.zona}</div>
+                </div>
+
+                {/* Fraccionamiento y Uso de Suelo */}
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Fraccionamiento</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.fraccionamiento}</div>
+                </div>
+
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Uso de Suelo</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.uso_suelo}</div>
+                </div>
+
+                {/* Régimen y Categoría */}
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Régimen</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.regimen}</div>
+                </div>
+
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Categoría</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.categoria}</div>
+                </div>
+
+                {/* Tipo y Precio */}
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Tipo</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.tipo}</div>
+                </div>
+
                 <div style={{
                   background: '#fef3c7',
-                  padding: '20px',
+                  padding: '16px',
                   borderRadius: '12px',
-                  border: '1px solid #fbbf24'
+                  border: '1px solid #f59e0b'
                 }}>
-                  <h4 style={{
-                    margin: '0 0 16px 0',
-                    color: '#92400e',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
-                    <span style={{
-                      width: '8px',
-                      height: '8px',
-                      background: '#f59e0b',
-                      borderRadius: '50%'
-                    }}></span>
-                    Características
-                  </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#92400e', fontSize: '14px' }}>Uso de Suelo:</span>
-                      <span style={{ fontWeight: '600', color: '#78350f' }}>{selectedResult.uso_suelo}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#92400e', fontSize: '14px' }}>Régimen:</span>
-                      <span style={{ fontWeight: '600', color: '#78350f' }}>{selectedResult.regimen}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#92400e', fontSize: '14px' }}>Categoría:</span>
-                      <span style={{ fontWeight: '600', color: '#78350f' }}>{selectedResult.categoria}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#92400e', fontSize: '14px' }}>Tipo:</span>
-                      <span style={{ fontWeight: '600', color: '#78350f' }}>{selectedResult.tipo}</span>
-                    </div>
+                  <div style={{ fontSize: '12px', color: '#92400e', fontWeight: '600', marginBottom: '4px' }}>Precio por m²</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: '#92400e' }}>${selectedResult.precio_m2}</div>
+                </div>
+
+                {/* Medidas */}
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Metros Cuadrados</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.metros_cuadrados}</div>
+                </div>
+
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Frente (m)</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.frente_metros}</div>
+                </div>
+
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Fondo (m)</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.fondo_metros}</div>
+                </div>
+
+                {/* Stock y Entrega */}
+                <div style={{
+                  background: '#dcfce7',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #22c55e'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#166534', fontWeight: '600', marginBottom: '4px' }}>Stock</div>
+                  <div style={{ fontSize: '18px', fontWeight: '700', color: '#166534' }}>{selectedResult.stock}</div>
+                </div>
+
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Entrega</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.entrega}</div>
+                </div>
+
+                {/* Ubicación (span completo) */}
+                <div style={{
+                  background: '#eff6ff',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #3b82f6',
+                  gridColumn: '1 / -1'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#1e40af', fontWeight: '600', marginBottom: '4px' }}>Ubicación</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e40af' }}>{selectedResult.ubicacion}</div>
+                </div>
+
+                {/* Vigencia y Contacto */}
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Vigencia Precio</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>
+                    {selectedResult.vigencia_precio ? new Date(selectedResult.vigencia_precio).toLocaleDateString() : 'N/A'}
                   </div>
                 </div>
 
-                {/* Tarjeta de Medidas */}
                 <div style={{
-                  background: '#ecfdf5',
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Contacto Nombre</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.contacto_nombre}</div>
+                </div>
+
+                <div style={{
+                  background: '#f8fafc',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Contacto Teléfono</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>{selectedResult.contacto_telefono}</div>
+                </div>
+
+                {/* Precio Total (destacado) */}
+                <div style={{
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   padding: '20px',
                   borderRadius: '12px',
-                  border: '1px solid #86efac'
+                  border: '1px solid #059669',
+                  gridColumn: '1 / -1',
+                  textAlign: 'center'
                 }}>
-                  <h4 style={{
-                    margin: '0 0 16px 0',
-                    color: '#065f46',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
-                    <span style={{
-                      width: '8px',
-                      height: '8px',
-                      background: '#10b981',
-                      borderRadius: '50%'
-                    }}></span>
-                    Medidas
-                  </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#065f46', fontSize: '14px' }}>Metros²:</span>
-                      <span style={{ fontWeight: '600', color: '#064e3b' }}>{selectedResult.metros_cuadrados} m²</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#065f46', fontSize: '14px' }}>Frente:</span>
-                      <span style={{ fontWeight: '600', color: '#064e3b' }}>{selectedResult.frente_metros} m</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#065f46', fontSize: '14px' }}>Fondo:</span>
-                      <span style={{ fontWeight: '600', color: '#064e3b' }}>{selectedResult.fondo_metros} m</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#065f46', fontSize: '14px' }}>Stock:</span>
-                      <span style={{ fontWeight: '600', color: '#064e3b' }}>{selectedResult.stock}</span>
-                    </div>
+                  <div style={{ fontSize: '14px', color: '#d1fae5', fontWeight: '600', marginBottom: '8px' }}>PRECIO TOTAL</div>
+                  <div style={{ fontSize: '28px', fontWeight: '800', color: '#ffffff' }}>
+                    ${(selectedResult.precio_m2 * selectedResult.metros_cuadrados).toLocaleString()}
                   </div>
                 </div>
 
-                {/* Tarjeta de Precios */}
+                {/* Fecha de Creación */}
                 <div style={{
-                  background: '#fee2e2',
-                  padding: '20px',
+                  background: '#f8fafc',
+                  padding: '16px',
                   borderRadius: '12px',
-                  border: '1px solid #fca5a5'
+                  border: '1px solid #e2e8f0',
+                  gridColumn: '1 / -1'
                 }}>
-                  <h4 style={{
-                    margin: '0 0 16px 0',
-                    color: '#991b1b',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
-                    <span style={{
-                      width: '8px',
-                      height: '8px',
-                      background: '#ef4444',
-                      borderRadius: '50%'
-                    }}></span>
-                    Precios
-                  </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#991b1b', fontSize: '14px' }}>Precio m²:</span>
-                      <span style={{ fontWeight: '600', color: '#7f1d1d' }}>${selectedResult.precio_m2}</span>
-                    </div>
-                    <div style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      paddingTop: '12px',
-                      borderTop: '1px dashed #fca5a5'
-                    }}>
-                      <span style={{ color: '#991b1b', fontSize: '16px', fontWeight: '600' }}>Precio Total:</span>
-                      <span style={{ 
-                        fontWeight: '700', 
-                        color: '#7f1d1d',
-                        fontSize: '18px'
-                      }}>
-                        ${(selectedResult.precio_m2 * selectedResult.metros_cuadrados).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Tarjeta de Contacto y Fechas */}
-                <div style={{
-                  background: '#f3e8ff',
-                  padding: '20px',
-                  borderRadius: '12px',
-                  border: '1px solid #c7d2fe'
-                }}>
-                  <h4 style={{
-                    margin: '0 0 16px 0',
-                    color: '#3730a3',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}>
-                    <span style={{
-                      width: '8px',
-                      height: '8px',
-                      background: '#6366f1',
-                      borderRadius: '50%'
-                    }}></span>
-                    Contacto y Fechas
-                  </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#3730a3', fontSize: '14px' }}>Contacto:</span>
-                      <span style={{ fontWeight: '600', color: '#312e81' }}>{selectedResult.contacto_nombre}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#3730a3', fontSize: '14px' }}>Teléfono:</span>
-                      <span style={{ fontWeight: '600', color: '#312e81' }}>{selectedResult.contacto_telefono}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#3730a3', fontSize: '14px' }}>Entrega:</span>
-                      <span style={{ fontWeight: '600', color: '#312e81' }}>{selectedResult.entrega}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#3730a3', fontSize: '14px' }}>Vigencia:</span>
-                      <span style={{ fontWeight: '600', color: '#312e81' }}>
-                        {selectedResult.vigencia_precio ? new Date(selectedResult.vigencia_precio).toLocaleDateString() : 'N/A'}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#3730a3', fontSize: '14px' }}>Creado:</span>
-                      <span style={{ fontWeight: '600', color: '#312e81', fontSize: '12px' }}>
-                        {new Date(selectedResult.created_at).toLocaleDateString()}
-                      </span>
-                    </div>
+                  <div style={{ fontSize: '12px', color: '#64748b', fontWeight: '600', marginBottom: '4px' }}>Fecha de Creación</div>
+                  <div style={{ fontSize: '16px', fontWeight: '600', color: '#1e293b' }}>
+                    {new Date(selectedResult.created_at).toLocaleString()}
                   </div>
                 </div>
               </div>
 
-            {/* Navegación entre resultados */}
-            <div style={{
-              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-              padding: '20px 32px',
-              borderRadius: '0 0 16px 16px',
-              borderTop: '1px solid #e5e7eb'
-            }}>
+              {/* Navegación entre resultados */}
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                gap: '16px'
+                padding: '20px',
+                background: '#f9fafb',
+                borderRadius: '12px',
+                border: '1px solid #e5e7eb'
               }}>
                 <button
                   onClick={() => navigateResult('prev')}
                   disabled={selectedIndex === 0}
                   style={{
-                    background: selectedIndex === 0 ? '#e5e7eb' : '#3b82f6',
-                    color: 'white',
+                    background: selectedIndex === 0 ? '#f3f4f6' : '#3b82f6',
                     border: 'none',
-                    padding: '12px 20px',
                     borderRadius: '8px',
+                    padding: '12px 20px',
                     fontSize: '14px',
                     fontWeight: '600',
                     cursor: selectedIndex === 0 ? 'not-allowed' : 'pointer',
+                    color: '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    transition: 'all 0.2s ease',
-                    opacity: selectedIndex === 0 ? 0.6 : 1
+                    transition: 'all 0.2s ease'
                   }}
                 >
-                  <span>←</span>
-                  Anterior
+                  ← Anterior
                 </button>
                 
                 <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px'
+                  background: '#ffffff',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid #e5e7eb',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: '#374151'
                 }}>
-                  <span style={{ 
-                    fontSize: '16px', 
-                    fontWeight: '700',
-                    color: '#1e293b'
-                  }}>
-                    {selectedIndex + 1}
-                  </span>
-                  <span style={{ 
-                    fontSize: '12px', 
-                    color: '#64748b',
-                    fontWeight: '500'
-                  }}>
-                    de {results.length} resultados
-                  </span>
+                  {selectedIndex + 1} de {results.length}
                 </div>
                 
                 <button
                   onClick={() => navigateResult('next')}
                   disabled={selectedIndex === results.length - 1}
                   style={{
-                    background: selectedIndex === results.length - 1 ? '#e5e7eb' : '#3b82f6',
-                    color: 'white',
+                    background: selectedIndex === results.length - 1 ? '#f3f4f6' : '#3b82f6',
                     border: 'none',
-                    padding: '12px 20px',
                     borderRadius: '8px',
+                    padding: '12px 20px',
                     fontSize: '14px',
                     fontWeight: '600',
                     cursor: selectedIndex === results.length - 1 ? 'not-allowed' : 'pointer',
+                    color: '#ffffff',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    transition: 'all 0.2s ease',
-                    opacity: selectedIndex === results.length - 1 ? 0.6 : 1
+                    transition: 'all 0.2s ease'
                   }}
                 >
-                  Siguiente
-                  <span>→</span>
+                  Siguiente →
                 </button>
               </div>
 
-              {/* Indicadores de progreso */}
+              {/* Instrucciones */}
               <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                gap: '6px',
-                marginTop: '16px'
+                marginTop: '16px',
+                padding: '16px',
+                background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+                borderRadius: '12px',
+                border: '1px solid #0ea5e9',
+                fontSize: '13px',
+                color: '#0c4a6e'
               }}>
-                {results.map((_, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      width: '8px',
-                      height: '8px',
-                      borderRadius: '50%',
-                      background: index === selectedIndex ? '#3b82f6' : '#e5e7eb',
-                      transition: 'all 0.3s ease'
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Instrucciones */}
-            <div style={{
-              margin: '16px 32px 24px',
-              padding: '16px 20px',
-              background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-              border: '1px solid #3b82f6',
-              borderRadius: '12px',
-              fontSize: '13px',
-              color: '#1e40af',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}>
-              <span style={{
-                fontSize: '20px',
-                minWidth: '24px',
-                textAlign: 'center'
-              }}>💡</span>
-              <div>
-                <strong style={{ color: '#1e40af', fontSize: '14px' }}>Atajos de teclado:</strong><br/>
-                <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <>
-                    <div>• <strong>Un click:</strong> Ver detalles completos</div>
-                    <div>• <strong>Doble click:</strong> {user.permisos && user.permisos[selectedModule] === true ? 
-                      `Entrar al módulo de ${selectedModule}` : 
-                      `Solicitar acceso al módulo de ${selectedModule}`
-                    }</div>
-                    <div>• <strong>Flechas ← →:</strong> Navegar entre resultados</div>
-                    <div>• <strong>ESC:</strong> Cerrar detalles</div>
-                  </>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '16px' }}>💡</span>
+                  <strong style={{ color: '#075985' }}>Instrucciones de uso:</strong>
+                </div>
+                <div style={{ marginLeft: '24px' }}>
+                  <div style={{ marginBottom: '4px' }}>• <strong>Un click:</strong> Ver detalles (lo que estás viendo ahora)</div>
+                  <div style={{ marginBottom: '4px' }}>• <strong>Doble click:</strong> {user.permisos && user.permisos[selectedModule] === true ? 
+                    `Entrar al módulo de ${selectedModule}` : 
+                    `Solicitar acceso al módulo de ${selectedModule}`
+                  }</div>
+                  <div>• <strong>Flechas:</strong> Navegar entre resultados</div>
                 </div>
               </div>
             </div>
