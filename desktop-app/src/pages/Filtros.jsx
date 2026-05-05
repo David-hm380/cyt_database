@@ -1142,383 +1142,120 @@ function Filtros() {
 
       {/* Modal de Detalles Completos */}
       {selectedResult && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div style={{
-            backgroundColor: 'var(--bg-primary)',
-            borderRadius: 'var(--radius-lg)',
-            boxShadow: 'var(--shadow-lg)',
-            maxWidth: '700px',
-            width: '100%',
-            maxHeight: '85vh',
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            {/* Header */}
-            <div style={{
-              background: 'var(--primary-color)',
-              padding: '20px',
-              borderRadius: 'var(--radius-lg) var(--radius-lg) 0 0',
-              position: 'relative'
-            }}>
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
-                <div>
-                  <h2 style={{ 
-                    margin: 0, 
-                    color: 'var(--text-inverse)',
-                    fontSize: '20px',
-                    fontWeight: '700'
-                  }}>
-                    {selectedModule.charAt(0).toUpperCase() + selectedModule.slice(1)} #{selectedResult.id}
-                  </h2>
-                  <p style={{
-                    margin: '4px 0 0',
-                    color: 'rgba(255, 255, 255, 0.9)',
-                    fontSize: '14px',
-                    fontWeight: '500'
-                  }}>
-                    Información completa del inmueble
-                  </p>
-                </div>
-                <button
-                  onClick={closeDetails}
-                  className="btn btn-secondary"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.2)',
-                    border: '1px solid rgba(255, 255, 255, 0.3)',
-                    borderRadius: 'var(--radius)',
-                    width: '32px',
-                    height: '32px',
-                    fontSize: '18px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '0'
-                  }}
-                >
-                  ×
-                </button>
+        <div className="modal-overlay">
+          <div className="modal" style={{ width: '800px', maxHeight: '90vh' }}>
+            <div className="modal-header">
+              <h3>Detalles del {selectedModule.charAt(0).toUpperCase() + selectedModule.slice(1)}</h3>
+              <button 
+                className="btn btn-secondary"
+                onClick={closeDetails}
+              >
+                ×
+              </button>
+            </div>
+            
+            <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
+              <h4 style={{ margin: '0 0 15px 0', color: '#2c3e50' }}>Información del {selectedModule.charAt(0).toUpperCase() + selectedModule.slice(1)}</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div><strong>ID:</strong> {selectedResult.id}</div>
+                <div><strong>Zona:</strong> {selectedResult.zona}</div>
+                <div><strong>Fraccionamiento:</strong> {selectedResult.fraccionamiento}</div>
+                <div><strong>Uso de Suelo:</strong> {selectedResult.uso_suelo}</div>
+                <div><strong>Régimen:</strong> {selectedResult.regimen}</div>
+                <div><strong>Categoría:</strong> {selectedResult.categoria}</div>
+                <div><strong>Tipo:</strong> {selectedResult.tipo}</div>
+                <div><strong>Precio/m²:</strong> ${parseFloat(selectedResult.precio_m2).toLocaleString()}</div>
+                <div><strong>Metros Cuadrados:</strong> {selectedResult.metros_cuadrados} m²</div>
+                <div><strong>Frente:</strong> {selectedResult.frente_metros} m</div>
+                <div><strong>Fondo:</strong> {selectedResult.fondo_metros} m</div>
+                <div><strong>Stock:</strong> {selectedResult.stock}</div>
+                <div><strong>Total:</strong> ${(parseFloat(selectedResult.precio_m2) * parseFloat(selectedResult.metros_cuadrados)).toLocaleString()}</div>
               </div>
             </div>
 
-            {/* Content */}
-            <div style={{
-              padding: '20px',
-              overflowY: 'auto',
-              flex: 1
+            <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '8px', marginBottom: '20px' }}>
+              <h4 style={{ margin: '0 0 15px 0', color: '#2c3e50' }}>Ubicación y Contacto</h4>
+              <div style={{ display: 'grid', gap: '10px' }}>
+                <div><strong>Entrega:</strong> {selectedResult.entrega}</div>
+                <div><strong>Ubicación:</strong> {selectedResult.ubicacion}</div>
+                <div><strong>Contacto:</strong> {selectedResult.contacto_nombre}</div>
+                <div><strong>Teléfono:</strong> {selectedResult.contacto_telefono}</div>
+                <div><strong>Vigencia Precio:</strong> {selectedResult.vigencia_precio ? new Date(selectedResult.vigencia_precio).toLocaleDateString() : 'N/A'}</div>
+                <div><strong>Fecha de Creación:</strong><br/><span style={{ color: '#666', fontSize: '14px' }}>
+                  {selectedResult.created_at ? 
+                    new Date(selectedResult.created_at).toLocaleString('es-MX', {
+                      day: '2-digit',
+                      month: '2-digit', 
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    }) : 'N/A'
+                  }
+                </span></div>
+              </div>
+            </div>
+
+            {/* Navegación entre resultados */}
+            <div style={{ 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center', 
+              padding: '20px', 
+              backgroundColor: '#f8f9fa', 
+              borderRadius: '8px',
+              gap: '10px'
             }}>
-              {/* Grid de información */}
+              <button 
+                onClick={() => navigateResult('prev')}
+                disabled={selectedIndex === 0}
+                className="btn btn-primary"
+                style={{ opacity: selectedIndex === 0 ? 0.5 : 1 }}
+              >
+                ← Anterior
+              </button>
+              
               <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-                gap: '16px',
-                marginBottom: '20px'
+                background: '#ffffff', 
+                padding: '8px 16px', 
+                borderRadius: '4px', 
+                border: '1px solid #e2e8f0',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#374151'
               }}>
-                {/* ID */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>ID</div>
-                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)' }}>{selectedResult.id}</div>
-                </div>
-
-                {/* Zona */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Zona</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.zona}</div>
-                </div>
-
-                {/* Fraccionamiento */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Fraccionamiento</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.fraccionamiento}</div>
-                </div>
-
-                {/* Uso de Suelo */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Uso de Suelo</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.uso_suelo}</div>
-                </div>
-
-                {/* Régimen */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Régimen</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.regimen}</div>
-                </div>
-
-                {/* Categoría */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Categoría</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.categoria}</div>
-                </div>
-
-                {/* Tipo */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Tipo</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.tipo}</div>
-                </div>
-
-                {/* Precio por m² */}
-                <div style={{
-                  background: 'var(--warning-light)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--warning-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--warning-color)', fontWeight: '600', marginBottom: '4px' }}>Precio por m²</div>
-                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--warning-color)' }}>${selectedResult.precio_m2}</div>
-                </div>
-
-                {/* Metros Cuadrados */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Metros Cuadrados</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.metros_cuadrados}</div>
-                </div>
-
-                {/* Frente */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Frente (m)</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.frente_metros}</div>
-                </div>
-
-                {/* Fondo */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Fondo (m)</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.fondo_metros}</div>
-                </div>
-
-                {/* Stock */}
-                <div style={{
-                  background: 'var(--success-light)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--success-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--success-color)', fontWeight: '600', marginBottom: '4px' }}>Stock</div>
-                  <div style={{ fontSize: '18px', fontWeight: '700', color: 'var(--success-color)' }}>{selectedResult.stock}</div>
-                </div>
-
-                {/* Entrega */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Entrega</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.entrega}</div>
-                </div>
-
-                {/* Ubicación (span completo) */}
-                <div style={{
-                  background: 'var(--primary-light)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--primary-color)',
-                  gridColumn: '1 / -1'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--primary-color)', fontWeight: '600', marginBottom: '4px' }}>Ubicación</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.ubicacion}</div>
-                </div>
-
-                {/* Vigencia Precio */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Vigencia Precio</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                    {selectedResult.vigencia_precio ? new Date(selectedResult.vigencia_precio).toLocaleDateString() : 'N/A'}
-                  </div>
-                </div>
-
-                {/* Contacto Nombre */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Contacto Nombre</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.contacto_nombre}</div>
-                </div>
-
-                {/* Contacto Teléfono */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Contacto Teléfono</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>{selectedResult.contacto_telefono}</div>
-                </div>
-
-                {/* Precio Total (destacado) */}
-                <div style={{
-                  background: 'var(--success-color)',
-                  padding: '20px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--success-hover)',
-                  gridColumn: '1 / -1',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ fontSize: '14px', color: 'var(--success-light)', fontWeight: '600', marginBottom: '8px' }}>PRECIO TOTAL</div>
-                  <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-inverse)' }}>
-                    ${(selectedResult.precio_m2 * selectedResult.metros_cuadrados).toLocaleString()}
-                  </div>
-                </div>
-
-                {/* Fecha de Creación */}
-                <div style={{
-                  background: 'var(--bg-secondary)',
-                  padding: '16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)',
-                  gridColumn: '1 / -1'
-                }}>
-                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: '600', marginBottom: '4px' }}>Fecha de Creación</div>
-                  <div style={{ fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)' }}>
-                    {new Date(selectedResult.created_at).toLocaleString()}
-                  </div>
-                </div>
+                {selectedIndex + 1} de {results.length}
               </div>
+              
+              <button 
+                onClick={() => navigateResult('next')}
+                disabled={selectedIndex === results.length - 1}
+                className="btn btn-primary"
+                style={{ opacity: selectedIndex === results.length - 1 ? 0.5 : 1 }}
+              >
+                Siguiente →
+              </button>
+            </div>
 
-              {/* Navegación entre resultados */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '16px',
-                background: 'var(--bg-tertiary)',
-                borderRadius: 'var(--radius)',
-                border: '1px solid var(--border-color)'
-              }}>
-                <button
-                  onClick={() => navigateResult('prev')}
-                  disabled={selectedIndex === 0}
-                  className="btn btn-secondary"
-                  style={{
-                    opacity: selectedIndex === 0 ? 0.5 : 1,
-                    cursor: selectedIndex === 0 ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  ← Anterior
-                </button>
-                
-                <div style={{
-                  background: 'var(--bg-primary)',
-                  padding: '8px 16px',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid var(--border-color)',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: 'var(--text-primary)'
-                }}>
-                  {selectedIndex + 1} de {results.length}
-                </div>
-                
-                <button
-                  onClick={() => navigateResult('next')}
-                  disabled={selectedIndex === results.length - 1}
-                  className="btn btn-secondary"
-                  style={{
-                    opacity: selectedIndex === results.length - 1 ? 0.5 : 1,
-                    cursor: selectedIndex === results.length - 1 ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  Siguiente →
-                </button>
+            {/* Instrucciones */}
+            <div style={{
+              marginTop: '20px',
+              padding: '16px',
+              backgroundColor: '#f8f9fa',
+              borderRadius: '8px',
+              fontSize: '13px',
+              color: '#374151'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <span style={{ fontSize: '16px' }}>ℹ️</span>
+                <strong>Instrucciones de uso:</strong>
               </div>
-
-              {/* Instrucciones */}
-              <div style={{
-                marginTop: '16px',
-                padding: '16px',
-                background: 'var(--info-light)',
-                borderRadius: 'var(--radius)',
-                border: '1px solid var(--info-color)',
-                fontSize: '13px',
-                color: 'var(--text-primary)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '16px' }}>ℹ️</span>
-                  <strong style={{ color: 'var(--info-color)' }}>Instrucciones de uso:</strong>
-                </div>
-                <div style={{ marginLeft: '24px' }}>
-                  <div style={{ marginBottom: '4px' }}>• <strong>Un click:</strong> Ver detalles (lo que estás viendo ahora)</div>
-                  <div style={{ marginBottom: '4px' }}>• <strong>Doble click:</strong> {user.permisos && user.permisos[selectedModule] === true ? 
-                    `Entrar al módulo de ${selectedModule}` : 
-                    `Solicitar acceso al módulo de ${selectedModule}`
-                  }</div>
-                  <div>• <strong>Flechas:</strong> Navegar entre resultados</div>
-                </div>
+              <div style={{ marginLeft: '24px' }}>
+                <div style={{ marginBottom: '4px' }}>• <strong>Un click:</strong> Ver detalles (lo que estás viendo ahora)</div>
+                <div style={{ marginBottom: '4px' }}>• <strong>Doble click:</strong> {user.permisos && user.permisos[selectedModule] === true ? 
+                  `Entrar al módulo de ${selectedModule}` : 
+                  `Solicitar acceso al módulo de ${selectedModule}`
+                }</div>
+                <div>• <strong>Flechas:</strong> Navegar entre resultados</div>
               </div>
             </div>
           </div>
