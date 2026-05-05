@@ -21,6 +21,7 @@ function Usuarios() {
   const [userPermissions, setUserPermissions] = useState({});
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [forceUpdate, setForceUpdate] = useState(0); // Para forzar re-render
 
   const navigate = useNavigate();
 
@@ -172,9 +173,26 @@ function Usuarios() {
           setSelectedUser(null);
         }
         
-        // Limpiar completamente el estado del formulario
-        resetForm();
+        // Forzar limpieza completa de estados con timeout
         setShowForm(false);
+        
+        // Usar setTimeout para asegurar que el estado se limpie después del re-render
+        setTimeout(() => {
+          resetForm();
+          setEditingUser(null);
+          // Forzar un re-render completo
+          setFormData({
+            nombre: '',
+            username: '',
+            password: '',
+            permisos: {
+              terrenos: false,
+              usuarios: false
+            }
+          });
+          // Forzar actualización del componente
+          setForceUpdate(prev => prev + 1);
+        }, 50);
         
         // Recargar la lista
         loadUsuarios();
@@ -307,7 +325,7 @@ function Usuarios() {
                 ×
               </button>
             </div>
-            <form key={editingUser ? `edit-${editingUser.id}` : 'new'} onSubmit={handleSubmit}>
+            <form key={`${editingUser ? `edit-${editingUser.id}` : 'new'}-${forceUpdate}`} onSubmit={handleSubmit}>
               <div className="modal-body">
                 <div style={{ marginBottom: '15px' }}>
                   <label>Nombre:</label>

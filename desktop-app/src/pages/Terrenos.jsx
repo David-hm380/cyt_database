@@ -31,6 +31,7 @@ function Terrenos() {
   const [pagination, setPagination] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [forceUpdate, setForceUpdate] = useState(0); // Para forzar re-render
 
   const navigate = useNavigate();
 
@@ -189,9 +190,35 @@ function Terrenos() {
           setSelectedTerreno(null);
         }
         
-        // Limpiar completamente el estado del formulario
-        resetForm();
+        // Forzar limpieza completa de estados con timeout
         setShowForm(false);
+        
+        // Usar setTimeout para asegurar que el estado se limpie después del re-render
+        setTimeout(() => {
+          resetForm();
+          setEditingTerreno(null);
+          // Forzar un re-render completo
+          setFormData({
+            zona: '',
+            fraccionamiento: '',
+            uso_suelo: '',
+            regimen: '',
+            categoria: '',
+            tipo: '',
+            precio_m2: '',
+            metros_cuadrados: '',
+            frente_metros: '',
+            fondo_metros: '',
+            stock: '',
+            entrega: '',
+            ubicacion: '',
+            vigencia_precio: '',
+            contacto_nombre: '',
+            contacto_telefono: ''
+          });
+          // Forzar actualización del componente
+          setForceUpdate(prev => prev + 1);
+        }, 50);
         
         // Recargar la lista
         loadTerrenosPaginated();
@@ -321,7 +348,7 @@ function Terrenos() {
                 ×
               </button>
             </div>
-            <form key={editingTerreno ? `edit-${editingTerreno.id}` : 'new'} onSubmit={handleSubmit}>
+            <form key={`${editingTerreno ? `edit-${editingTerreno.id}` : 'new'}-${forceUpdate}`} onSubmit={handleSubmit}>
               <div className="modal-body" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                   <div>
