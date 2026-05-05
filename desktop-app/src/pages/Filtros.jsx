@@ -17,6 +17,8 @@ function Filtros() {
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showPermissionDenied, setShowPermissionDenied] = useState(false);
+  const [deniedModule, setDeniedModule] = useState('');
 
   // Función para validar que solo se ingresen números
   const handleNumberInput = (e, callback) => {
@@ -192,9 +194,10 @@ function Filtros() {
     console.log('¿Tiene permiso?', hasPermission);
     
     if (!hasPermission) {
-      // Mostrar mensaje más amigable
+      // Mostrar modal personalizado en lugar de alert()
       const moduleName = modulePermission.charAt(0).toUpperCase() + modulePermission.slice(1);
-      alert(`No tienes permisos para acceder al módulo de ${moduleName}.\n\nContacta al administrador para solicitar acceso.`);
+      setDeniedModule(moduleName);
+      setShowPermissionDenied(true);
       return;
     }
 
@@ -1044,6 +1047,70 @@ function Filtros() {
             </div>
           </div>
         )}
+
+      {/* Modal de Permiso Denegado */}
+      {showPermissionDenied && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            padding: '24px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+            maxWidth: '400px',
+            width: '90%',
+            textAlign: 'center'
+          }}>
+            <div style={{
+              fontSize: '48px',
+              color: '#ef4444',
+              marginBottom: '16px'
+            }}>
+              🚫
+            </div>
+            <h3 style={{ 
+              margin: '0 0 16px 0', 
+              color: '#333',
+              fontSize: '20px',
+              fontWeight: '600'
+            }}>
+              Acceso Denegado
+            </h3>
+            <p style={{ 
+              margin: '0 0 24px 0', 
+              color: '#666',
+              lineHeight: '1.5'
+            }}>
+              No tienes permisos para acceder al módulo de <strong>{deniedModule}</strong>.<br/><br/>
+              Contacta al administrador para solicitar acceso.
+            </p>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setShowPermissionDenied(false);
+                setDeniedModule('');
+              }}
+              style={{ 
+                padding: '12px 24px',
+                fontSize: '16px',
+                fontWeight: '600'
+              }}
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );
