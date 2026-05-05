@@ -1597,13 +1597,15 @@ function Filtros() {
               <div>
                 <strong style={{ color: '#1e40af', fontSize: '14px' }}>Atajos de teclado:</strong><br/>
                 <div style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <div>• <strong>Un click:</strong> Ver detalles completos</div>
-                  <div>• <strong>Doble click:</strong> {user.permisos && user.permisos[selectedModule] === true ? 
-                    `Entrar al módulo de ${selectedModule}` : 
-                    `Solicitar acceso al módulo de ${selectedModule}`
-                  }</div>
-                  <div>• <strong>Flechas ← →:</strong> Navegar entre resultados</div>
-                  <div>• <strong>ESC:</strong> Cerrar detalles</div>
+                  <>
+                    <div>• <strong>Un click:</strong> Ver detalles completos</div>
+                    <div>• <strong>Doble click:</strong> {user.permisos && user.permisos[selectedModule] === true ? 
+                      `Entrar al módulo de ${selectedModule}` : 
+                      `Solicitar acceso al módulo de ${selectedModule}`
+                    }</div>
+                    <div>• <strong>Flechas ← →:</strong> Navegar entre resultados</div>
+                    <div>• <strong>ESC:</strong> Cerrar detalles</div>
+                  </>
                 </div>
               </div>
             </div>
